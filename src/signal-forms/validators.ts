@@ -1,7 +1,7 @@
 import {Signal} from '@angular/core';
-import {SetValidationState, Validator} from './validation';
+import {SetValidationState, ValidatorFn} from './validation';
 
-export function required(): Validator {
+export function required(): ValidatorFn {
   return (value: unknown, setState: SetValidationState) => {
     const valid = value !== null && value !== undefined && value !== '';
     if (valid) {
@@ -12,7 +12,7 @@ export function required(): Validator {
   };
 }
 
-export function minLength(length: number): Validator<string | Array<unknown>> {
+export function minLength(length: number): ValidatorFn<string | Array<unknown>> {
   return (value: string | Array<unknown>, setState: SetValidationState) => {
     const valid =
       value === null || value === undefined || value.length >= length;
@@ -30,7 +30,7 @@ export function minLength(length: number): Validator<string | Array<unknown>> {
   };
 }
 
-export function equalsTo<Value>(otherValue: Signal<Value>): Validator<Value> {
+export function equalsTo<Value>(otherValue: Signal<Value>): ValidatorFn<Value> {
   return (value: Value, setState: SetValidationState) => {
     const valid = value === otherValue();
 
