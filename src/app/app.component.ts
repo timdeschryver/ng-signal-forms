@@ -11,6 +11,9 @@ import {
 } from 'src/signal-forms';
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {SignalInputErrorDirective} from "@signal-form/signal-input-error.directive";
+import {withErrorComponent} from "@signal-form/signal-input-error.token";
+import {CustomErrorComponent} from "./custom-input-error.component";
 
 @Component({
   selector: 'app-root',
@@ -87,7 +90,8 @@ import { FormsModule } from '@angular/forms';
     </div>
   `,
   standalone: true,
-  imports: [JsonPipe, FormsModule, SignalInputDirective, NgIf, NgFor],
+  imports: [JsonPipe, FormsModule, SignalInputDirective, SignalInputErrorDirective, NgIf, NgFor],
+  providers: [withErrorComponent(CustomErrorComponent)]
 })
 export class AppComponent {
   // TODO: this currently used to validate cross fields
