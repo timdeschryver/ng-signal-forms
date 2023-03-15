@@ -6,6 +6,7 @@ import {
   computeValidateState,
   computeValidators,
   InvalidDetails,
+  ValidationErrors,
   ValidationState,
   Validator,
 } from './validation';
@@ -15,7 +16,7 @@ export type TouchedState = 'TOUCHED' | 'UNTOUCHED';
 
 export type FormField<Value = unknown> = {
   value: SettableSignal<Value>;
-  errors: Signal<{}>;
+  errors: Signal<ValidationErrors>;
   errorsArray: Signal<InvalidDetails[]>;
   state: Signal<ValidationState>;
   dirtyState: Signal<DirtyState>;

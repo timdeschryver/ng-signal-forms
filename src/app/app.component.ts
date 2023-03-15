@@ -109,7 +109,6 @@ export class AppComponent {
     >([]),
   };
 
-  // TODO: disable validator based on condition: {validator: v, when/disable: () => ..., message: () => ...}
   form = createFormGroup({
     username: createFormField('', {
       validators: [V.required(), uniqueUsername()],
@@ -168,7 +167,9 @@ function uniqueUsername<Value>(): Validator<Value> {
         setState('VALID');
       } else {
         setState('INVALID', {
-          uniqueUsername: false,
+          uniqueUsername: {
+            details: false
+          },
         });
       }
     }, 3000);
@@ -188,7 +189,9 @@ function todoUniqueInList<Value>(allTodos: Signal<any[]>): Validator<Value> {
       setState('VALID');
     } else {
       setState('INVALID', {
-        todoUniqueInList: false,
+        todoUniqueInList: {
+          details: false
+        },
       });
     }
   };

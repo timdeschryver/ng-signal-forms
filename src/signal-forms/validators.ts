@@ -7,7 +7,7 @@ export function required(): ValidatorFn {
     if (valid) {
       setState('VALID');
     } else {
-      setState('INVALID', {required: true});
+      setState('INVALID', {required: {details: true}});
     }
   };
 }
@@ -22,8 +22,10 @@ export function minLength(length: number): ValidatorFn<string | Array<unknown>> 
     } else {
       setState('INVALID', {
         minLength: {
-          currentLength: value.length,
-          minLength: length,
+          details: {
+            currentLength: value.length,
+            minLength: length,
+          }
         },
       });
     }
@@ -39,9 +41,11 @@ export function equalsTo<Value>(otherValue: Signal<Value>): ValidatorFn<Value> {
     } else {
       setState('INVALID', {
         equalsTo: {
-          otherValue: otherValue(),
-          currentValue: value,
-        },
+          details: {
+            otherValue: otherValue(),
+            currentValue: value,
+          },
+        }
       });
     }
   };
