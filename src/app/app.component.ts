@@ -8,11 +8,11 @@ import {
   SignalInputDirective,
   V,
   Validator,
-} from 'src/signal-forms';
+  SignalInputErrorDirective,
+  withErrorComponent
+} from '@signal-form';
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {SignalInputErrorDirective} from "@signal-form/signal-input-error.directive";
-import {withErrorComponent} from "@signal-form/signal-input-error.token";
 import {CustomErrorComponent} from "./custom-input-error.component";
 
 @Component({

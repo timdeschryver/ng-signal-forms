@@ -4,9 +4,9 @@ import {
   inject, InjectionToken, Injector,
   ViewContainerRef
 } from '@angular/core';
-import {SIGNAL_INPUT_ERROR_COMPONENT} from "@signal-form/signal-input-error.token";
-import {SignalInputDirective} from "@signal-form/signal-input.directive";
-import {FormField} from "@signal-form/form-field";
+import {SIGNAL_INPUT_ERROR_COMPONENT} from "./signal-input-error.token";
+import {SignalInputDirective} from "./signal-input.directive";
+import {FormField} from "./form-field";
 
 
 const SIGNAL_INPUT_ERROR_FIELD= new InjectionToken<FormField>('Signal input error form field');
