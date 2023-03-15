@@ -112,7 +112,12 @@ export class AppComponent {
     }),
     passwords: createFormGroup({
       password: createFormField(this.reference.password.password, {
-        validators: [V.required(), V.minLength(5)],
+        validators: [V.required(), {
+          validator: V.minLength(5),
+          disable: () => this.reference.password.password().startsWith('@@'),
+          message: ({currentLength, minLength}: {currentLength: number
+            minLength: number}) => `Password must be at least ${minLength} characters long. Add at least ${minLength - currentLength} characters`
+        }],
       }),
       passwordConfirmation: createFormField(
         this.reference.password.passwordConfirmation,
