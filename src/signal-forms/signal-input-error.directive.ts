@@ -20,7 +20,7 @@ export const injectErrorField = () => inject(SIGNAL_INPUT_ERROR_FIELD);
 export class SignalInputErrorDirective implements AfterViewInit{
    private readonly viewContainerRef = inject(ViewContainerRef);
    private readonly signalInput = inject(SignalInputDirective, {optional: true});
-   private readonly component = inject(SIGNAL_INPUT_ERROR_COMPONENT)
+   private readonly component = inject(SIGNAL_INPUT_ERROR_COMPONENT);
 
   ngAfterViewInit() {
     Promise.resolve().then(() => {

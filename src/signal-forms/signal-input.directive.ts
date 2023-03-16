@@ -1,6 +1,7 @@
-import { Directive, effect, Input } from '@angular/core';
-import { NgModel } from '@angular/forms';
-import { FormField } from './form-field';
+import {Directive, effect, inject, Input, OnInit} from '@angular/core';
+import {NgModel} from '@angular/forms';
+import {FormField} from './form-field';
+import {SIGNAL_INPUT_MODIFIER, SignalInputModifier} from "@signal-form/signal-input-modifier.token";
 
 @Directive({
   selector: '[ngModel][formField]',
@@ -13,18 +14,25 @@ import { FormField } from './form-field';
     '[class.control-pending]': 'this.formField.state() === "PENDING"',
   },
 })
-export class SignalInputDirective {
-  @Input() formField!: FormField<unknown>;
+export class SignalInputDirective implements OnInit {
+  private readonly modifiers = inject(SIGNAL_INPUT_MODIFIER, {optional: true}) as SignalInputModifier[] | null;
+  private readonly model = inject(NgModel);
+
+  @Input() formField!: FormField;
 
   onModelChange(value: unknown) {
-    this.formField.value.set(value);
+    if (this.modifiers && this.modifiers.length === 1) {
+      this.modifiers[0].onModelChange(value);
+    } else {
+      this.formField.value.set(value);
+    }
   }
 
   onBlur() {
     this.formField.markAsTouched();
   }
 
-  constructor(private model: NgModel) {
+  constructor() {
     effect(() => {
       this.model.control.setValue(this.formField.value(), {
         emitEvent: false,
@@ -32,5 +40,15 @@ export class SignalInputDirective {
         emitModelToViewChange: true,
       });
     });
+  }
+
+  public ngOnInit() {
+    if (this.modifiers) {
+      if (this.modifiers.length !== 1) {
+        throw Error('only one modifier per signal input field supported.')
+      } else {
+        this.modifiers[0].registerOnSet(this.formField.value.set)
+      }
+    }
   }
 }
