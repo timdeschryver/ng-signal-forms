@@ -1,8 +1,11 @@
 import {computed, signal, Signal} from '@angular/core';
 
+export type ValidationError = { details: unknown, message?: string | ((params?: any) => string) };
+export type ValidationErrors = Record<string, ValidationError> | null;
+
 export type ValidationState = 'INIT' | 'VALID' | 'PENDING' | 'INVALID';
 type SetValidResult = (state: 'VALID') => void;
-type SetInvalidResult = (state: 'INVALID', errors: {}) => void;
+type SetInvalidResult = (state: 'INVALID', errors: ValidationErrors) => void;
 type SetPendingResult = (state: 'PENDING') => void;
 
 export type SetValidationState = SetValidResult &
@@ -18,9 +21,9 @@ export type ValidatorFn<Value = unknown> = (
 export type ValidatorObj<Value = unknown> = {
   validator: ValidatorFn<Value>,
   disable?: () => boolean,
-  message?: (params?: any) => string
+  message?: string | ((params?: any) => string)
 }
-export type ValidateState = { state: ValidationState; errors: null | {} };
+export type ValidateState = { state: ValidationState; errors: ValidationErrors };
 export type InvalidDetails = { path: string, key: string, details: unknown, message?: string };
 
 export function createValidateState(
@@ -40,17 +43,21 @@ export function createValidateState(
   }
 
   if (!validator.disable || !validator.disable()) {
-    validator.validator(value, (newState, newErrors?) => {
-      //todo: improve types
-      let errors: any = newErrors ?? null;
-      if (errors && validator.message) {
-        Object.keys(errors)
-          .forEach((key) => errors[key] = ({
-            [key]: errors[key],
-            message: validator.message
-          }))
+    validator.validator(value, (newState, newErrors?: ValidationErrors) => {
+      if (newErrors) {
+        Object.keys(newErrors)
+          .forEach((key) => {
+            if (validator.message) {
+              newErrors[key] = {
+                details: newErrors[key].details,
+                message: typeof validator.message === 'function' ? validator.message(newErrors[key].details) : validator.message
+              }
+              return;
+            }
+            newErrors[key] = {details: newErrors[key].details}
+          })
       }
-      state.set({state: newState, errors});
+      state.set({state: newState, errors: newErrors ?? null});
     });
   }
   return state;
@@ -80,22 +87,7 @@ export function computeErrors(validateSignal: Signal<ValidateState[]>) {
       if (!errors.errors) {
         return acc;
       }
-
-      const unwrappedErrors = Object.entries(errors.errors)
-        .map(([key, details]) => {
-          //todo: improve types
-          if ((details as any).message) {
-            const {message, ...newDetails} = (details as any);
-            return Object.keys(newDetails).length === 1 && newDetails[key] ? newDetails[key] : newDetails
-          }
-          return details
-        });
-
-      if (unwrappedErrors.length === 1) {
-        const key = Object.keys(errors.errors)[0];
-        return {...acc, [key]: unwrappedErrors[0]}
-      }
-      return {...acc, ...unwrappedErrors};
+      return {...acc, ...errors.errors};
     }, {});
   });
 }
@@ -107,12 +99,9 @@ export function computeErrorsArray(validateSignal: Signal<ValidateState[]>) {
         return acc;
       }
       return [...acc, ...Object.entries(errors.errors)
-        .map(([key, details]) => {
-          //todo: improve types
-          if ((details as any).message) {
-            const {message, ...newDetails} = (details as any);
-            const rawValueExtractedDetails = Object.keys(newDetails).length === 1 && newDetails[key] ? newDetails[key] : newDetails
-            return {path: '', key, details: rawValueExtractedDetails, message: message(rawValueExtractedDetails)}
+        .map(([key, {details, message}]) => {
+          if (message) {
+            return {path: '', key, details, message: typeof message === 'function' ? message(details) : message}
           }
           return {path: '', key, details}
         })];
