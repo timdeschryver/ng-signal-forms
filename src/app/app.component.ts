@@ -9,6 +9,7 @@ import {
   V,
   Validator,
   SignalInputErrorDirective,
+  SignalInputDebounceDirective,
   withErrorComponent
 } from '@signal-form';
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
@@ -23,7 +24,7 @@ import {CustomErrorComponent} from "./custom-input-error.component";
         <div>
           <label>Username (tim is invalid)</label>
           <small>{{ form.controls.username.errors() | json }}</small>
-          <input ngModel [formField]="form.controls.username" />
+          <input ngModel [debounce]="700" [formField]="form.controls.username" />
         </div>
 
         <div>
@@ -90,7 +91,7 @@ import {CustomErrorComponent} from "./custom-input-error.component";
     </div>
   `,
   standalone: true,
-  imports: [JsonPipe, FormsModule, SignalInputDirective, SignalInputErrorDirective, NgIf, NgFor],
+  imports: [JsonPipe, FormsModule, SignalInputDirective, SignalInputErrorDirective, NgIf, NgFor, SignalInputDebounceDirective],
   providers: [withErrorComponent(CustomErrorComponent)]
 })
 export class AppComponent {
