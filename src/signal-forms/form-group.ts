@@ -1,5 +1,5 @@
-import {computed, isSignal, SettableSignal, Signal,} from '@angular/core';
-import {DirtyState, FormField, TouchedState} from './form-field';
+import { computed, isSignal, SettableSignal, Signal } from '@angular/core';
+import { DirtyState, FormField, TouchedState } from './form-field';
 import {
   computeErrors,
   computeErrorsArray,
@@ -12,7 +12,8 @@ import {
 } from './validation';
 
 export type FormGroup<
-  Controls extends | { [p: string]: FormField | FormGroup }
+  Controls extends
+    | { [p: string]: FormField | FormGroup }
     | SettableSignal<any[]> = {}
 > = {
   value: Signal<{
@@ -35,9 +36,15 @@ export type FormGroupOptions = {
 };
 
 export function createFormGroup<
-  Controls extends | { [p: string]: FormField | FormGroup }
+  Controls extends
+    | { [p: string]: FormField | FormGroup }
     | SettableSignal<any[]>
->(formGroup: Controls, options?: FormGroupOptions): FormGroup<Controls> {
+>(
+  formGroupCreator: () => Controls,
+  options?: FormGroupOptions
+): FormGroup<Controls> {
+  const formGroup = formGroupCreator();
+
   const valueSignal = computed(() => {
     const fg =
       typeof formGroup === 'function' && isSignal(formGroup)
@@ -90,8 +97,10 @@ export function createFormGroup<
           ? formGroup()
           : formGroup;
       const childErrors = Object.entries(fg).map(([key, f]) => {
-        return (f as any).errorsArray().map((e: any) => ({...e, path: e.path ? (key + '.' + e.path) : key}));
-      })
+        return (f as any)
+          .errorsArray()
+          .map((e: any) => ({ ...e, path: e.path ? key + '.' + e.path : key }));
+      });
       return myErrors.concat(...childErrors);
     }),
     dirtyState: computed(() => {
