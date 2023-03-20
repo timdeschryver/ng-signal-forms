@@ -11,16 +11,20 @@ import {
   Validator,
 } from './validation';
 
+export type UnwrappedFormGroup<Controls> = {
+  [K in keyof Controls]: Controls[K] extends FormField<infer V>
+    ? V
+    : Controls[K] extends FormGroup<infer G>
+    ? UnwrappedFormGroup<G>
+    : never;
+};
+
 export type FormGroup<
   Controls extends
     | { [p: string]: FormField | FormGroup }
     | SettableSignal<any[]> = {}
 > = {
-  value: Signal<{
-    [K in keyof Controls]: Controls[K] extends FormField
-      ? Controls[K]['value']
-      : never;
-  }>;
+  value: Signal<UnwrappedFormGroup<Controls>>;
   controls: { [K in keyof Controls]: Controls[K] };
   state: Signal<ValidationState>;
   dirtyState: Signal<DirtyState>;

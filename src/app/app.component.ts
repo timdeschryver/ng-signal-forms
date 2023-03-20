@@ -11,6 +11,7 @@ import {
   SignalInputErrorDirective,
   SignalInputDebounceDirective,
   withErrorComponent,
+  UnwrappedFormGroup,
 } from '@signal-form';
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -130,7 +131,7 @@ export class AppComponent {
               }) =>
                 `Password must be at least ${minLength} characters long or start with rob. Add at least ${
                   minLength - currentLength
-                } characters or change '${pw().substring(0,3)}' to rob`,
+                } characters or change '${pw().substring(0, 3)}' to rob`,
             },
           ],
         }));
@@ -139,7 +140,9 @@ export class AppComponent {
           password,
           passwordConfirmation: createFormField<string | undefined>(undefined, {
             validators: [V.required(), V.equalsTo(password.value)],
-            hidden: () => password.value() === '',
+            hidden: () => {
+              return password.value() === '';
+            },
           }),
         };
       }),
@@ -161,7 +164,9 @@ export class AppComponent {
           validators: [
             V.required(),
             V.minLength(5),
-            todoUniqueInList(this.form.controls.todos.value as any),
+            todoUniqueInList(
+              this.form.controls.todos.value as unknown as Signal<Todo[]>
+            ),
           ],
         }),
         completed: createFormField(false),
