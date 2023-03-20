@@ -1,4 +1,4 @@
-import { Component, Signal, signal } from '@angular/core';
+import { Component, SettableSignal, Signal, signal } from '@angular/core';
 import {
   createFormField,
   createFormGroup,
@@ -10,11 +10,12 @@ import {
   Validator,
   SignalInputErrorDirective,
   SignalInputDebounceDirective,
-  withErrorComponent
+  withErrorComponent,
+  UnwrappedFormGroup,
 } from '@signal-form';
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {CustomErrorComponent} from "./custom-input-error.component";
+import { CustomErrorComponent } from './custom-input-error.component';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,11 @@ import {CustomErrorComponent} from "./custom-input-error.component";
         <div>
           <label>Username (tim is invalid)</label>
           <small>{{ form.controls.username.errors() | json }}</small>
-          <input ngModel [debounce]="700" [formField]="form.controls.username" />
+          <input
+            ngModel
+            [debounce]="700"
+            [formField]="form.controls.username"
+          />
         </div>
 
         <div>
@@ -91,64 +96,81 @@ import {CustomErrorComponent} from "./custom-input-error.component";
     </div>
   `,
   standalone: true,
-  imports: [JsonPipe, FormsModule, SignalInputDirective, SignalInputErrorDirective, NgIf, NgFor, SignalInputDebounceDirective],
-  providers: [withErrorComponent(CustomErrorComponent)]
+  imports: [
+    JsonPipe,
+    FormsModule,
+    SignalInputDirective,
+    SignalInputErrorDirective,
+    NgIf,
+    NgFor,
+    SignalInputDebounceDirective,
+  ],
+  providers: [withErrorComponent(CustomErrorComponent)],
 })
 export class AppComponent {
-  // TODO: this currently used to validate cross fields
-  // rework this so it's not needed or separate model and form
-  reference = {
-    password: {
-      password: signal(''),
-      passwordConfirmation: signal(''),
-    },
-    todos: signal<
-      FormGroup<{
-        description: FormField<string>;
-        completed: FormField<boolean>;
-      }>[]
-    >([]),
-  };
-
-  form = createFormGroup({
-    username: createFormField('', {
+  form = createFormGroup(() => {
+    const username = createFormField('', {
       validators: [V.required(), uniqueUsername()],
-    }),
-    passwords: createFormGroup({
-      password: createFormField(this.reference.password.password, {
-        validators: [V.required(), {
-          validator: V.minLength(5),
-          disable: () => this.reference.password.password().startsWith('@@'),
-          message: ({currentLength, minLength}: {currentLength: number
-            minLength: number}) => `Password must be at least ${minLength} characters long. Add at least ${minLength - currentLength} characters`
-        }],
-      }),
-      passwordConfirmation: createFormField(
-        this.reference.password.passwordConfirmation,
-        {
+    });
+
+    return {
+      username,
+      passwords: createFormGroup(() => {
+        const password = createFormField('', (pw) => ({
           validators: [
             V.required(),
-            V.equalsTo(this.reference.password.password),
+            {
+              validator: V.minLength(5),
+              disable: () => pw().toLocaleLowerCase().startsWith('rob'),
+              message: ({
+                currentLength,
+                minLength,
+              }: {
+                currentLength: number;
+                minLength: number;
+              }) =>
+                `Password must be at least ${minLength} characters long or start with rob. Add at least ${
+                  minLength - currentLength
+                } characters or change '${pw().substring(0, 3)}' to rob`,
+            },
           ],
-          hidden: () => this.reference.password.password() === '',
+        }));
+
+        return {
+          password,
+          passwordConfirmation: createFormField<string | undefined>(undefined, {
+            validators: [V.required(), V.equalsTo(password.value)],
+            hidden: () => {
+              return password.value() === '';
+            },
+          }),
+        };
+      }),
+      todos: createFormGroup<SettableSignal<FormGroup<Todo>[]>>(
+        () => {
+          return signal([]);
+        },
+        {
+          validators: [V.minLength(1)],
         }
       ),
-    }),
-    todos: createFormGroup(this.reference.todos, {
-      validators: [V.minLength(1)],
-    }),
+    };
   });
 
   createTodo = () => {
-    return createFormGroup({
-      description: createFormField('', {
-        validators: [
-          V.required(),
-          V.minLength(5),
-          todoUniqueInList(this.reference.todos),
-        ],
-      }),
-      completed: createFormField(false),
+    return createFormGroup<Todo>(() => {
+      return {
+        description: createFormField('', {
+          validators: [
+            V.required(),
+            V.minLength(5),
+            todoUniqueInList(
+              this.form.controls.todos.value as unknown as Signal<Todo[]>
+            ),
+          ],
+        }),
+        completed: createFormField(false),
+      };
     });
   };
 
@@ -169,7 +191,7 @@ function uniqueUsername<Value>(): Validator<Value> {
       } else {
         setState('INVALID', {
           uniqueUsername: {
-            details: false
+            details: false,
           },
         });
       }
@@ -177,23 +199,28 @@ function uniqueUsername<Value>(): Validator<Value> {
   };
 }
 
-function todoUniqueInList<Value>(allTodos: Signal<any[]>): Validator<Value> {
+function todoUniqueInList<Value>(allTodos: Signal<Todo[]>): Validator<Value> {
   return (value: Value, setState: SetValidationState) => {
     if (value === '' || value === null) {
       setState('VALID');
       return;
     }
+
     const valid =
-      allTodos().filter((todo) => todo.value().description === value).length ===
-      1;
+      allTodos().filter((todo) => todo.description === value).length === 1;
     if (valid) {
       setState('VALID');
     } else {
       setState('INVALID', {
         todoUniqueInList: {
-          details: false
+          details: false,
         },
       });
     }
   };
 }
+
+type Todo = {
+  description: FormField<string>;
+  completed: FormField<boolean>;
+};
