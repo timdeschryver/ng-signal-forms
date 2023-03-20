@@ -32,15 +32,17 @@ export type FormFieldOptions = {
   hidden?: () => boolean;
   disabled?: () => boolean;
 };
+export type FormFieldOptionsCreator<T> = (value: Signal<T>) => FormFieldOptions
 
 export function createFormField<Value>(
   value: Value | SettableSignal<Value>,
-  options?: FormFieldOptions
+  options?: FormFieldOptions | FormFieldOptionsCreator<Value>
 ): FormField<Value> {
   const valueSignal =
     typeof value === 'function' && isSignal(value) ? value : signal(value);
+  const finalOptions = options && typeof options === 'function' ? options(valueSignal) : options;
 
-  const validatorsSignal = computeValidators(valueSignal, options?.validators);
+  const validatorsSignal = computeValidators(valueSignal, finalOptions?.validators);
   const validateStateSignal = computeValidateState(validatorsSignal);
 
   const errorsSignal = computeErrors(validateStateSignal);
@@ -59,15 +61,15 @@ export function createFormField<Value>(
     }
   });
 
-  if (options?.hidden) {
+  if (finalOptions?.hidden) {
     effect(() => {
-      hiddenSignal.set(options!.hidden!());
+      hiddenSignal.set(finalOptions!.hidden!());
     });
   }
 
-  if (options?.disabled) {
+  if (finalOptions?.disabled) {
     effect(() => {
-      disabledSignal.set(options!.disabled!());
+      disabledSignal.set(finalOptions!.disabled!());
     });
   }
 

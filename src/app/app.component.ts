@@ -3,6 +3,7 @@ import {
   createFormField,
   createFormGroup,
   FormField,
+  FormGroup,
   SetValidationState,
   SignalInputDirective,
   V,
@@ -114,13 +115,12 @@ export class AppComponent {
     return {
       username,
       passwords: createFormGroup(() => {
-        const password = createFormField('', {
+        const password = createFormField('', (pw) => ({
           validators: [
             V.required(),
             {
               validator: V.minLength(5),
-              disable: () =>
-                username.value().toLocaleLowerCase().startsWith('robin'),
+              disable: () => pw().toLocaleLowerCase().startsWith('rob'),
               message: ({
                 currentLength,
                 minLength,
@@ -128,12 +128,12 @@ export class AppComponent {
                 currentLength: number;
                 minLength: number;
               }) =>
-                `Password must be at least ${minLength} characters long. Add at least ${
+                `Password must be at least ${minLength} characters long or start with rob. Add at least ${
                   minLength - currentLength
-                } characters`,
+                } characters or change '${pw().substring(0,3)}' to rob`,
             },
           ],
-        });
+        }));
 
         return {
           password,
@@ -143,7 +143,7 @@ export class AppComponent {
           }),
         };
       }),
-      todos: createFormGroup<SettableSignal<Todo[]>>(
+      todos: createFormGroup<SettableSignal<FormGroup<Todo>[]>>(
         () => {
           return signal([]);
         },
@@ -171,7 +171,7 @@ export class AppComponent {
 
   addTodo() {
     this.form.controls.todos.controls.mutate((todos) =>
-      (todos as any).push(this.createTodo())
+      todos.push(this.createTodo())
     );
   }
 }
