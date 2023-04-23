@@ -1,6 +1,6 @@
 import {Component, computed} from "@angular/core";
 import {JsonPipe, NgFor, NgIf} from "@angular/common";
-import {injectErrorField} from "@signal-form";
+import {injectErrorField} from "@ng-signal-form/platform";
 
 @Component({
   selector: 'custom-signal-input-error',

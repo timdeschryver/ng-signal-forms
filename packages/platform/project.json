@@ -1,0 +1,57 @@
+{
+  "name": "platform",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/platform/src",
+  "prefix": "ng-signal-form",
+  "tags": [],
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:ng-packagr",
+      "outputs": ["node_modules/@ng-signal-form/platform"],
+      "options": {
+        "project": "packages/platform/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "packages/platform/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "packages/platform/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs platform {args.ver} {args.tag}"
+      },
+      "dependsOn": ["build"]
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "packages/platform/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "packages/platform/**/*.ts",
+          "packages/platform/**/*.html"
+        ]
+      }
+    }
+  }
+}

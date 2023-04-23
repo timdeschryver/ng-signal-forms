@@ -1,5 +1,5 @@
-import { computed, isSignal, SettableSignal, Signal } from '@angular/core';
-import { DirtyState, FormField, TouchedState } from './form-field';
+import {computed, isSignal, Signal, WritableSignal} from '@angular/core';
+import {DirtyState, FormField, TouchedState} from './form-field';
 import {
   computeErrors,
   computeErrorsArray,
@@ -22,7 +22,7 @@ export type UnwrappedFormGroup<Controls> = {
 export type FormGroup<
   Controls extends
     | { [p: string]: FormField | FormGroup }
-    | SettableSignal<any[]> = {}
+    | WritableSignal<any[]> = {}
 > = {
   value: Signal<UnwrappedFormGroup<Controls>>;
   controls: { [K in keyof Controls]: Controls[K] };
@@ -42,7 +42,7 @@ export type FormGroupOptions = {
 export function createFormGroup<
   Controls extends
     | { [p: string]: FormField | FormGroup }
-    | SettableSignal<any[]>
+    | WritableSignal<any[]>
 >(
   formGroupCreator: () => Controls,
   options?: FormGroupOptions

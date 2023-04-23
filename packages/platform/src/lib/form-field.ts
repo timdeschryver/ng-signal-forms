@@ -1,4 +1,4 @@
-import {effect, isSignal, SettableSignal, signal, Signal,} from '@angular/core';
+import {effect, isSignal, signal, Signal, WritableSignal} from '@angular/core';
 import {
   computeErrors,
   computeErrorsArray,
@@ -15,7 +15,7 @@ export type DirtyState = 'PRISTINE' | 'DIRTY';
 export type TouchedState = 'TOUCHED' | 'UNTOUCHED';
 
 export type FormField<Value = unknown> = {
-  value: SettableSignal<Value>;
+  value: WritableSignal<Value>;
   errors: Signal<ValidationErrors>;
   errorsArray: Signal<InvalidDetails[]>;
   state: Signal<ValidationState>;
@@ -35,11 +35,12 @@ export type FormFieldOptions = {
 export type FormFieldOptionsCreator<T> = (value: Signal<T>) => FormFieldOptions
 
 export function createFormField<Value>(
-  value: Value | SettableSignal<Value>,
+  value: Value | WritableSignal<Value>,
   options?: FormFieldOptions | FormFieldOptionsCreator<Value>
 ): FormField<Value> {
   const valueSignal =
-    typeof value === 'function' && isSignal(value) ? value : signal(value);
+    // needed until types for writable signal are fixed
+    (typeof value === 'function' && isSignal(value) ? value : signal(value)) as WritableSignal<Value>;
   const finalOptions = options && typeof options === 'function' ? options(valueSignal) : options;
 
   const validatorsSignal = computeValidators(valueSignal, finalOptions?.validators);

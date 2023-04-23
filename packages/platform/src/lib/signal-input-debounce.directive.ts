@@ -1,5 +1,5 @@
 import {Directive, forwardRef, Input, OnDestroy} from '@angular/core';
-import {SIGNAL_INPUT_MODIFIER, SignalInputModifier} from "@signal-form/signal-input-modifier.token";
+import {SIGNAL_INPUT_MODIFIER, SignalInputModifier} from "./signal-input-modifier.token";
 import {debounceTime, Subject, Subscription} from "rxjs";
 
 export const DEBOUNCE_MODIFIER: any = {
