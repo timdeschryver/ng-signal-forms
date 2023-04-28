@@ -60,18 +60,26 @@ export function createFormField<Value>(
     if (valueSignal()) {
       dirtySignal.set('DIRTY');
     }
+  }, {
+    allowSignalWrites: true
   });
 
   if (finalOptions?.hidden) {
     effect(() => {
-      hiddenSignal.set(finalOptions!.hidden!());
-    });
+        hiddenSignal.set(finalOptions!.hidden!());
+      },
+      {
+        allowSignalWrites: true
+      });
   }
 
   if (finalOptions?.disabled) {
     effect(() => {
-      disabledSignal.set(finalOptions!.disabled!());
-    });
+        disabledSignal.set(finalOptions!.disabled!());
+      },
+      {
+        allowSignalWrites: true
+      });
   }
 
   return {

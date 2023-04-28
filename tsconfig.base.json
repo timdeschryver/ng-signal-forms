@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@ng-signal-form/platform": ["./node_modules/@ng-signal-form","packages/platform/src/index.ts"]
+      "@ng-signal-form/platform": ["packages/platform/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

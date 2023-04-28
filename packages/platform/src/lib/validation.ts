@@ -1,4 +1,4 @@
-import {computed, signal, Signal} from '@angular/core';
+import {computed, effect, signal, Signal, WritableSignal} from '@angular/core';
 
 export type ValidationError = { details: unknown, message?: string | ((params?: any) => string) };
 export type ValidationErrors = Record<string, ValidationError> | null;
@@ -26,20 +26,22 @@ export type ValidatorObj<Value = unknown> = {
 export type ValidateState = { state: ValidationState; errors: ValidationErrors };
 export type InvalidDetails = { path: string, key: string, details: unknown, message?: string };
 
-export function createValidateState(
-  value: unknown,
-  validator: Validator
-): Signal<ValidateState> {
-  const state = signal<{ state: ValidationState; errors: null | {} }>({
+export function createValidateState(): WritableSignal<ValidateState> {
+  return signal<{ state: ValidationState; errors: null | Record<string, ValidationError> }>({
     errors: null,
     state: 'INIT',
   });
+}
 
+  export function executeValidator(
+    state: WritableSignal<ValidateState>,
+    value: unknown,
+    validator: Validator) {
   if (typeof validator === 'function') {
     validator(value, (newState, newErrors?) => {
-      state.set({state: newState, errors: newErrors ?? null});
+      state.set({state: newState, errors: (newErrors as ValidationErrors) ?? null});
     });
-    return state;
+    return;
   }
 
   if (!validator.disable || !validator.disable()) {
@@ -60,19 +62,25 @@ export function createValidateState(
       state.set({state: newState, errors: newErrors ?? null});
     });
   }
-  return state;
+  return;
 }
 
 export function computeValidators(
   valueSignal: Signal<unknown>,
   validators: Validator[] = []
 ) {
-  return computed(() => {
-    const currentValue = valueSignal();
-    return validators.map((validator) =>
-      createValidateState(currentValue, validator)
-    );
+  const computedValidatorStates = computed(() => {
+    valueSignal();
+    return validators.map(() => createValidateState());
   });
+  effect(() => {
+    computedValidatorStates().forEach((state, index) => {
+      executeValidator(state, valueSignal(), validators[index])
+    })
+  }, {
+    allowSignalWrites: true
+  })
+  return computedValidatorStates;
 }
 
 export function computeValidateState(
