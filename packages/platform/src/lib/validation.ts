@@ -1,4 +1,4 @@
-import {computed, effect, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, effect, Injector, signal, Signal, WritableSignal} from '@angular/core';
 
 export type ValidationError = { details: unknown, message?: string | ((params?: any) => string) };
 export type ValidationErrors = Record<string, ValidationError> | null;
@@ -67,7 +67,8 @@ export function createValidateState(): WritableSignal<ValidateState> {
 
 export function computeValidators(
   valueSignal: Signal<unknown>,
-  validators: Validator[] = []
+  validators: Validator[] = [],
+  injector?: Injector
 ) {
   const computedValidatorStates = computed(() => {
     valueSignal();
@@ -78,7 +79,8 @@ export function computeValidators(
       executeValidator(state, valueSignal(), validators[index])
     })
   }, {
-    allowSignalWrites: true
+    allowSignalWrites: true,
+    injector
   })
   return computedValidatorStates;
 }

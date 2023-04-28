@@ -1,4 +1,4 @@
-import {Component, Signal, signal, WritableSignal} from '@angular/core';
+import {Component, inject, Injector, Signal, signal, WritableSignal} from '@angular/core';
 import {
   createFormField,
   createFormGroup,
@@ -107,6 +107,7 @@ import {CustomErrorComponent} from './custom-input-error.component';
   providers: [withErrorComponent(CustomErrorComponent)],
 })
 export class AppComponent {
+  private injector = inject(Injector)
   form = createFormGroup(() => {
     const username = createFormField('', {
       validators: [V.required(), uniqueUsername()],
@@ -160,6 +161,7 @@ export class AppComponent {
     return createFormGroup<Todo>(() => {
       return {
         description: createFormField('', {
+          injector: this.injector,
           validators: [
             V.required(),
             V.minLength(5),
@@ -168,8 +170,12 @@ export class AppComponent {
             ),
           ],
         }),
-        completed: createFormField(false),
+        completed: createFormField(false, {
+          injector: this.injector
+        }),
       };
+    }, {
+      injector: this.injector
     });
   };
 

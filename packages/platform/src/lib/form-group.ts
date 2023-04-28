@@ -1,4 +1,4 @@
-import {computed, isSignal, Signal, WritableSignal} from '@angular/core';
+import {computed, Injector, isSignal, Signal, WritableSignal} from '@angular/core';
 import {DirtyState, FormField, TouchedState} from './form-field';
 import {
   computeErrors,
@@ -37,6 +37,7 @@ export type FormGroupOptions = {
   validators?: Validator<any>[];
   hidden?: () => boolean;
   disabled?: () => boolean;
+  injector?: Injector;
 };
 
 export function createFormGroup<
@@ -64,7 +65,7 @@ export function createFormGroup<
     }, {} as any);
   });
 
-  const validatorsSignal = computeValidators(valueSignal, options?.validators);
+  const validatorsSignal = computeValidators(valueSignal, options?.validators, options?.injector);
   const validateStateSignal = computeValidateState(validatorsSignal);
 
   const errorsSignal = computeErrors(validateStateSignal);

@@ -1,4 +1,4 @@
-import {effect, isSignal, signal, Signal, WritableSignal} from '@angular/core';
+import {effect, Injector, isSignal, signal, Signal, WritableSignal} from '@angular/core';
 import {
   computeErrors,
   computeErrorsArray,
@@ -31,19 +31,20 @@ export type FormFieldOptions = {
   validators?: Validator<any>[];
   hidden?: () => boolean;
   disabled?: () => boolean;
+  injector?: Injector;
 };
 export type FormFieldOptionsCreator<T> = (value: Signal<T>) => FormFieldOptions
 
 export function createFormField<Value>(
   value: Value | WritableSignal<Value>,
-  options?: FormFieldOptions | FormFieldOptionsCreator<Value>
+  options?: FormFieldOptions | FormFieldOptionsCreator<Value>,
 ): FormField<Value> {
   const valueSignal =
     // needed until types for writable signal are fixed
     (typeof value === 'function' && isSignal(value) ? value : signal(value)) as WritableSignal<Value>;
   const finalOptions = options && typeof options === 'function' ? options(valueSignal) : options;
 
-  const validatorsSignal = computeValidators(valueSignal, finalOptions?.validators);
+  const validatorsSignal = computeValidators(valueSignal, finalOptions?.validators, finalOptions?.injector);
   const validateStateSignal = computeValidateState(validatorsSignal);
 
   const errorsSignal = computeErrors(validateStateSignal);
@@ -61,7 +62,8 @@ export function createFormField<Value>(
       dirtySignal.set('DIRTY');
     }
   }, {
-    allowSignalWrites: true
+    allowSignalWrites: true,
+    injector: finalOptions?.injector
   });
 
   if (finalOptions?.hidden) {
@@ -69,7 +71,8 @@ export function createFormField<Value>(
         hiddenSignal.set(finalOptions!.hidden!());
       },
       {
-        allowSignalWrites: true
+        allowSignalWrites: true,
+        injector: finalOptions.injector
       });
   }
 
@@ -78,7 +81,8 @@ export function createFormField<Value>(
         disabledSignal.set(finalOptions!.disabled!());
       },
       {
-        allowSignalWrites: true
+        allowSignalWrites: true,
+        injector: finalOptions.injector
       });
   }
 
