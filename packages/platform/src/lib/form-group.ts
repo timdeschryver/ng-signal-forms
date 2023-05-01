@@ -15,13 +15,12 @@ export type UnwrappedFormGroup<Controls> = {
   [K in keyof Controls]: Controls[K] extends FormField<infer V>
     ? V
     : Controls[K] extends FormGroup<infer G>
-    ? UnwrappedFormGroup<G>
-    : never;
+      ? UnwrappedFormGroup<G>
+      : never;
 };
 
 export type FormGroup<
-  Controls extends
-    | { [p: string]: FormField | FormGroup }
+  Controls extends | { [p: string]: FormField | FormGroup }
     | WritableSignal<any[]> = {}
 > = {
   value: Signal<UnwrappedFormGroup<Controls>>;
@@ -37,16 +36,15 @@ export type FormGroupOptions = {
   validators?: Validator<any>[];
   hidden?: () => boolean;
   disabled?: () => boolean;
-  injector?: Injector;
 };
 
 export function createFormGroup<
-  Controls extends
-    | { [p: string]: FormField | FormGroup }
+  Controls extends | { [p: string]: FormField | FormGroup }
     | WritableSignal<any[]>
 >(
   formGroupCreator: () => Controls,
-  options?: FormGroupOptions
+  options?: FormGroupOptions,
+  injector?: Injector
 ): FormGroup<Controls> {
   const formGroup = formGroupCreator();
 
@@ -65,7 +63,7 @@ export function createFormGroup<
     }, {} as any);
   });
 
-  const validatorsSignal = computeValidators(valueSignal, options?.validators, options?.injector);
+  const validatorsSignal = computeValidators(valueSignal, options?.validators, injector);
   const validateStateSignal = computeValidateState(validatorsSignal);
 
   const errorsSignal = computeErrors(validateStateSignal);
@@ -104,7 +102,7 @@ export function createFormGroup<
       const childErrors = Object.entries(fg).map(([key, f]) => {
         return (f as any)
           .errorsArray()
-          .map((e: any) => ({ ...e, path: e.path ? key + '.' + e.path : key }));
+          .map((e: any) => ({...e, path: e.path ? key + '.' + e.path : key}));
       });
       return myErrors.concat(...childErrors);
     }),
