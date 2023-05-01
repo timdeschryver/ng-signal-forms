@@ -1,10 +1,8 @@
-import {Component, inject, Injector, Signal, signal, WritableSignal} from '@angular/core';
+import {Component, inject, Signal, signal, WritableSignal} from '@angular/core';
 import {
-  createFormField,
-  createFormGroup,
   FormField,
   FormGroup,
-  SetValidationState,
+  SetValidationState, SignalFormBuilder,
   SignalInputDebounceDirective,
   SignalInputDirective,
   SignalInputErrorDirective,
@@ -107,16 +105,16 @@ import {CustomErrorComponent} from './custom-input-error.component';
   providers: [withErrorComponent(CustomErrorComponent)],
 })
 export class AppComponent {
-  private injector = inject(Injector)
-  form = createFormGroup(() => {
-    const username = createFormField('', {
+  private sfb = inject(SignalFormBuilder)
+  form = this.sfb.createFormGroup(() => {
+    const username = this.sfb.createFormField('', {
       validators: [V.required(), uniqueUsername()],
     });
 
     return {
       username,
-      passwords: createFormGroup(() => {
-        const password = createFormField('', (pw) => ({
+      passwords: this.sfb.createFormGroup(() => {
+        const password = this.sfb.createFormField('', (pw) => ({
           validators: [
             V.required(),
             {
@@ -138,7 +136,7 @@ export class AppComponent {
 
         return {
           password,
-          passwordConfirmation: createFormField<string | undefined>(undefined, {
+          passwordConfirmation: this.sfb.createFormField<string | undefined>(undefined, {
             validators: [V.required(), V.equalsTo(password.value)],
             hidden: () => {
               return password.value() === '';
@@ -146,7 +144,7 @@ export class AppComponent {
           }),
         };
       }),
-      todos: createFormGroup<WritableSignal<FormGroup<Todo>[]>>(
+      todos: this.sfb.createFormGroup<WritableSignal<FormGroup<Todo>[]>>(
         () => {
           return signal([]);
         },
@@ -158,10 +156,9 @@ export class AppComponent {
   });
 
   createTodo = () => {
-    return createFormGroup<Todo>(() => {
+    return this.sfb.createFormGroup<Todo>(() => {
       return {
-        description: createFormField('', {
-          injector: this.injector,
+        description: this.sfb.createFormField('', {
           validators: [
             V.required(),
             V.minLength(5),
@@ -170,12 +167,9 @@ export class AppComponent {
             ),
           ],
         }),
-        completed: createFormField(false, {
-          injector: this.injector
+        completed: this.sfb.createFormField(false, {
         }),
       };
-    }, {
-      injector: this.injector
     });
   };
 
