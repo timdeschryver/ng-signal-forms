@@ -1,9 +1,4 @@
-import {
-  AfterViewInit,
-  Directive,
-  inject, InjectionToken, Injector,
-  ViewContainerRef
-} from '@angular/core';
+import {AfterViewInit, Directive, inject, InjectionToken, Injector, ViewContainerRef} from '@angular/core';
 import {SIGNAL_INPUT_ERROR_COMPONENT} from "./signal-input-error.token";
 import {SignalInputDirective} from "./signal-input.directive";
 import {FormField} from "./form-field";

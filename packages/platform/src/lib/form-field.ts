@@ -1,4 +1,4 @@
-import {effect, isSignal, SettableSignal, signal, Signal,} from '@angular/core';
+import {effect, Injector, isSignal, signal, Signal, WritableSignal} from '@angular/core';
 import {
   computeErrors,
   computeErrorsArray,
@@ -15,7 +15,7 @@ export type DirtyState = 'PRISTINE' | 'DIRTY';
 export type TouchedState = 'TOUCHED' | 'UNTOUCHED';
 
 export type FormField<Value = unknown> = {
-  value: SettableSignal<Value>;
+  value: WritableSignal<Value>;
   errors: Signal<ValidationErrors>;
   errorsArray: Signal<InvalidDetails[]>;
   state: Signal<ValidationState>;
@@ -31,18 +31,20 @@ export type FormFieldOptions = {
   validators?: Validator<any>[];
   hidden?: () => boolean;
   disabled?: () => boolean;
+  injector?: Injector;
 };
 export type FormFieldOptionsCreator<T> = (value: Signal<T>) => FormFieldOptions
 
 export function createFormField<Value>(
-  value: Value | SettableSignal<Value>,
-  options?: FormFieldOptions | FormFieldOptionsCreator<Value>
+  value: Value | WritableSignal<Value>,
+  options?: FormFieldOptions | FormFieldOptionsCreator<Value>,
 ): FormField<Value> {
   const valueSignal =
-    typeof value === 'function' && isSignal(value) ? value : signal(value);
+    // needed until types for writable signal are fixed
+    (typeof value === 'function' && isSignal(value) ? value : signal(value)) as WritableSignal<Value>;
   const finalOptions = options && typeof options === 'function' ? options(valueSignal) : options;
 
-  const validatorsSignal = computeValidators(valueSignal, finalOptions?.validators);
+  const validatorsSignal = computeValidators(valueSignal, finalOptions?.validators, finalOptions?.injector);
   const validateStateSignal = computeValidateState(validatorsSignal);
 
   const errorsSignal = computeErrors(validateStateSignal);
@@ -59,18 +61,29 @@ export function createFormField<Value>(
     if (valueSignal()) {
       dirtySignal.set('DIRTY');
     }
+  }, {
+    allowSignalWrites: true,
+    injector: finalOptions?.injector
   });
 
   if (finalOptions?.hidden) {
     effect(() => {
-      hiddenSignal.set(finalOptions!.hidden!());
-    });
+        hiddenSignal.set(finalOptions!.hidden!());
+      },
+      {
+        allowSignalWrites: true,
+        injector: finalOptions.injector
+      });
   }
 
   if (finalOptions?.disabled) {
     effect(() => {
-      disabledSignal.set(finalOptions!.disabled!());
-    });
+        disabledSignal.set(finalOptions!.disabled!());
+      },
+      {
+        allowSignalWrites: true,
+        injector: finalOptions.injector
+      });
   }
 
   return {

@@ -1,21 +1,20 @@
-import { Component, SettableSignal, Signal, signal } from '@angular/core';
+import {Component, inject, Injector, Signal, signal, WritableSignal} from '@angular/core';
 import {
   createFormField,
   createFormGroup,
   FormField,
   FormGroup,
   SetValidationState,
+  SignalInputDebounceDirective,
   SignalInputDirective,
+  SignalInputErrorDirective,
   V,
   Validator,
-  SignalInputErrorDirective,
-  SignalInputDebounceDirective,
   withErrorComponent,
-  UnwrappedFormGroup,
-} from '@signal-form';
-import { JsonPipe, NgFor, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { CustomErrorComponent } from './custom-input-error.component';
+} from '@ng-signal-form/platform';
+import {JsonPipe, NgFor, NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {CustomErrorComponent} from './custom-input-error.component';
 
 @Component({
   selector: 'app-root',
@@ -108,6 +107,7 @@ import { CustomErrorComponent } from './custom-input-error.component';
   providers: [withErrorComponent(CustomErrorComponent)],
 })
 export class AppComponent {
+  private injector = inject(Injector)
   form = createFormGroup(() => {
     const username = createFormField('', {
       validators: [V.required(), uniqueUsername()],
@@ -146,7 +146,7 @@ export class AppComponent {
           }),
         };
       }),
-      todos: createFormGroup<SettableSignal<FormGroup<Todo>[]>>(
+      todos: createFormGroup<WritableSignal<FormGroup<Todo>[]>>(
         () => {
           return signal([]);
         },
@@ -161,6 +161,7 @@ export class AppComponent {
     return createFormGroup<Todo>(() => {
       return {
         description: createFormField('', {
+          injector: this.injector,
           validators: [
             V.required(),
             V.minLength(5),
@@ -169,8 +170,12 @@ export class AppComponent {
             ),
           ],
         }),
-        completed: createFormField(false),
+        completed: createFormField(false, {
+          injector: this.injector
+        }),
       };
+    }, {
+      injector: this.injector
     });
   };
 
