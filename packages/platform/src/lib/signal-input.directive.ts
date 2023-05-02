@@ -1,4 +1,4 @@
-import {Directive, effect, inject, Input, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Directive, effect, inject, Input, OnInit, signal} from '@angular/core';
 import {NgModel} from '@angular/forms';
 import {FormField} from './form-field';
 import {SIGNAL_INPUT_MODIFIER, SignalInputModifier} from "./signal-input-modifier.token";
@@ -51,5 +51,12 @@ export class SignalInputDirective implements OnInit {
         this.modifiers[0].registerOnSet(this.formField.value.set)
       }
     }
+
+    // needed for view to update on initial load of multi-page-form correctly. need to investigate why
+    setTimeout(() => this.model.control.setValue(this.formField?.value(), {
+      emitEvent: false,
+      emitViewToModelChange: false,
+      emitModelToViewChange: true,
+    }));
   }
 }

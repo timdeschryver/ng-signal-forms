@@ -9,5 +9,6 @@ export * from './lib/signal-input-error.directive';
 export * from './lib/signal-input-error.token';
 export * from './lib/signal-input-debounce.directive';
 export * from './lib/signal-input-modifier.token';
+export * from './lib/injectable-signal-form.token';
 
 export { V };

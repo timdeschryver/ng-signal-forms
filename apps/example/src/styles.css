@@ -45,3 +45,20 @@ div {
 small {
   margin-left: 0.2em;
 }
+
+
+nav ul {
+  padding: 0;
+  display: flex;
+}
+nav ul li {
+  list-style: none;
+  margin-right: 1rem;
+}
+nav ol {
+  padding: 0;
+  display: flex;
+}
+nav ol li {
+  margin: 0 1rem;
+}
