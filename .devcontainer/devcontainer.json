@@ -13,6 +13,7 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
+  // todo: this should be npm ci
   "postCreateCommand": "npm i --force",
   "onCreateCommand": "sudo cp .devcontainer/welcome-message.txt /usr/local/etc/vscode-dev-containers/first-run-notice.txt",
   "waitFor": "postCreateCommand",
@@ -36,7 +37,7 @@
         }
       },
       // Add the IDs of extensions you want installed when the container is created.
-      "extensions": ["Angular.ng-template", "esbenp.prettier-vscode"]
+      "extensions": ["Angular.ng-template", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
     }
   }
 }

@@ -1,14 +1,13 @@
 {
-  "name": "platform",
+  "name": "ng-signal-forms",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/platform/src",
   "prefix": "ng-signal-form",
   "tags": [],
   "projectType": "library",
   "targets": {
-    "build": {
+    "build-package": {
       "executor": "@angular-devkit/build-angular:ng-packagr",
-      "outputs": ["node_modules/@ng-signal-form/platform"],
       "options": {
         "project": "packages/platform/ng-package.json"
       },
@@ -22,12 +21,16 @@
       },
       "defaultConfiguration": "production"
     },
-    "publish": {
+    "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node tools/scripts/publish.mjs platform {args.ver} {args.tag}"
-      },
-      "dependsOn": ["build"]
+        "parallel": false,
+        "commands": [
+          {
+            "command": "nx run ng-signal-forms:build-package"
+          }
+        ]
+      }
     },
     "test": {
       "executor": "@nrwl/jest:jest",

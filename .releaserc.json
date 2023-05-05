@@ -1,0 +1,4 @@
+{
+  "pkgRoot": "dist/packages/ng-signal-forms",
+  "branches": ["main", { "name": "beta", "prerelease": true }]
+}

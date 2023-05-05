@@ -1,18 +1,25 @@
-import {Component, inject, Signal, signal, WritableSignal} from '@angular/core';
+import {
+  Component,
+  inject,
+  Signal,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import {
   FormField,
   FormGroup,
-  SetValidationState, SignalFormBuilder,
+  SetValidationState,
+  SignalFormBuilder,
   SignalInputDebounceDirective,
   SignalInputDirective,
   SignalInputErrorDirective,
   V,
   Validator,
   withErrorComponent,
-} from '@ng-signal-form/platform';
-import {JsonPipe, NgFor, NgIf} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {CustomErrorComponent} from './custom-input-error.component';
+} from '@ng-signal-form';
+import { JsonPipe, NgFor, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CustomErrorComponent } from './custom-input-error.component';
 
 @Component({
   selector: 'app-simple-form',
@@ -105,7 +112,7 @@ import {CustomErrorComponent} from './custom-input-error.component';
   providers: [withErrorComponent(CustomErrorComponent)],
 })
 export default class SimpleFormComponent {
-  private sfb = inject(SignalFormBuilder)
+  private sfb = inject(SignalFormBuilder);
   form = this.sfb.createFormGroup(() => {
     const username = this.sfb.createFormField('', {
       validators: [V.required(), uniqueUsername()],
@@ -121,9 +128,9 @@ export default class SimpleFormComponent {
               validator: V.minLength(5),
               disable: () => pw().toLocaleLowerCase().startsWith('rob'),
               message: ({
-                          currentLength,
-                          minLength,
-                        }: {
+                currentLength,
+                minLength,
+              }: {
                 currentLength: number;
                 minLength: number;
               }) =>
@@ -136,12 +143,15 @@ export default class SimpleFormComponent {
 
         return {
           password,
-          passwordConfirmation: this.sfb.createFormField<string | undefined>(undefined, {
-            validators: [V.required(), V.equalsTo(password.value)],
-            hidden: () => {
-              return password.value() === '';
-            },
-          }),
+          passwordConfirmation: this.sfb.createFormField<string | undefined>(
+            undefined,
+            {
+              validators: [V.required(), V.equalsTo(password.value)],
+              hidden: () => {
+                return password.value() === '';
+              },
+            }
+          ),
         };
       }),
       todos: this.sfb.createFormGroup<WritableSignal<FormGroup<Todo>[]>>(
@@ -167,8 +177,7 @@ export default class SimpleFormComponent {
             ),
           ],
         }),
-        completed: this.sfb.createFormField(false, {
-        }),
+        completed: this.sfb.createFormField(false, {}),
       };
     });
   };
