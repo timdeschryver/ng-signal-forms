@@ -1,9 +1,12 @@
-import {Component} from "@angular/core";
-import {injectSignalForm} from "./multi-page.form";
-import {FormsModule} from "@angular/forms";
-import {SignalInputDirective, SignalInputErrorDirective} from "@ng-signal-form/platform";
-import {JsonPipe} from "@angular/common";
-import {FormNavComponent} from "./form-nav.component";
+import { Component } from '@angular/core';
+import { injectSignalForm } from './multi-page.form';
+import { FormsModule } from '@angular/forms';
+import {
+  SignalInputDirective,
+  SignalInputErrorDirective,
+} from '@ng-signal-form';
+import { JsonPipe } from '@angular/common';
+import { FormNavComponent } from './form-nav.component';
 
 @Component({
   selector: 'app-step-1',
@@ -16,27 +19,19 @@ import {FormNavComponent} from "./form-nav.component";
     FormNavComponent,
   ],
   template: `
-    <app-form-nav/>
+    <app-form-nav />
     <div>
-
       <div>
         <label>First name</label>
         <small>{{ form.controls.firstName.errors() | json }}</small>
-        <input
-          ngModel
-          [formField]="form.controls.firstName"
-        />
+        <input ngModel [formField]="form.controls.firstName" />
       </div>
 
       <div>
         <label>Last name</label>
         <small>{{ form.controls.lastName.errors() | json }}</small>
-        <input
-          ngModel
-          [formField]="form.controls.lastName"
-        />
+        <input ngModel [formField]="form.controls.lastName" />
       </div>
-
     </div>
   `,
 })

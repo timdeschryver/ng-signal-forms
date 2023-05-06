@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'platform',
+  displayName: 'ng-signal-forms',
   preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../coverage/packages/platform',
+  coverageDirectory: '../../coverage/packages/ng-signal-forms',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',
