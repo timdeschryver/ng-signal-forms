@@ -3,7 +3,7 @@ import {
   createFormField,
   createFormGroup,
   createInjectableSignalForm,
-} from '@ng-signal-form';
+} from '@ng-signal-forms';
 import { signal } from '@angular/core';
 
 export const { injectSignalForm, provideSignalForm } =

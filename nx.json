@@ -1,5 +1,5 @@
 {
-  "npmScope": "ng-signal-form",
+  "npmScope": "ng-signal-forms",
   "workspaceLayout": {
     "libsDir": "packages"
   },

@@ -2,7 +2,7 @@
   "name": "ng-signal-forms",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/platform/src",
-  "prefix": "ng-signal-form",
+  "prefix": "ng-signal-forms",
   "tags": [],
   "projectType": "library",
   "targets": {

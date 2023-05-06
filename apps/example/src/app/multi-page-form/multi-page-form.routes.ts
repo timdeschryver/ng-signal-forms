@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { provideSignalForm } from './multi-page.form';
-import { withErrorComponent } from '@ng-signal-form';
+import { withErrorComponent } from '@ng-signal-forms';
 import { CustomErrorComponent } from '../custom-input-error.component';
 
 export const routes: Routes = [

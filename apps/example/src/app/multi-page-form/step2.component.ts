@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   SignalInputDirective,
   SignalInputErrorDirective,
-} from '@ng-signal-form';
+} from '@ng-signal-forms';
 import { injectSignalForm } from './multi-page.form';
 import { FormNavComponent } from './form-nav.component';
 

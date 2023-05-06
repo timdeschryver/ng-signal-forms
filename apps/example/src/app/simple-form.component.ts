@@ -16,7 +16,7 @@ import {
   V,
   Validator,
   withErrorComponent,
-} from '@ng-signal-form';
+} from '@ng-signal-forms';
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CustomErrorComponent } from './custom-input-error.component';

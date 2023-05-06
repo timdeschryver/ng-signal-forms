@@ -17,7 +17,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "ng-signal-form",
+            "prefix": "ng-signal-forms",
             "style": "kebab-case"
           }
         ]
