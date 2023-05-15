@@ -25,6 +25,8 @@ export type FormField<Value = unknown> = {
   disabled: Signal<boolean>;
   markAsTouched: () => void;
   markAsDirty: () => void;
+  reset: () => void;
+  registerOnReset: (fn: (value: Value) => void) => void
 };
 
 export type FormFieldOptions = {
@@ -86,6 +88,9 @@ export function createFormField<Value>(
       });
   }
 
+  const defaultValue = typeof value === 'function' && isSignal(value) ? value() :value;
+  let onReset = (value: Value) => {}
+
   return {
     value: valueSignal,
     errors: errorsSignal,
@@ -97,5 +102,12 @@ export function createFormField<Value>(
     disabled: disabledSignal,
     markAsTouched: () => touchedSignal.set('TOUCHED'),
     markAsDirty: () => dirtySignal.set('DIRTY'),
+    registerOnReset: (fn: (value: Value) => void) => onReset = fn,
+    reset: () => {
+      valueSignal.set(defaultValue);
+      touchedSignal.set('UNTOUCHED');
+      dirtySignal.set('PRISTINE');
+      onReset(defaultValue);
+    }
   };
 }

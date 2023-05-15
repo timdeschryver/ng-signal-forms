@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Directive, effect, inject, Input, OnInit, signal} from '@angular/core';
+import {Directive, effect, inject, Input, OnInit} from '@angular/core';
 import {NgModel} from '@angular/forms';
 import {FormField} from './form-field';
 import {SIGNAL_INPUT_MODIFIER, SignalInputModifier} from "./signal-input-modifier.token";
@@ -33,6 +33,7 @@ export class SignalInputDirective implements OnInit {
   }
 
   constructor() {
+
     effect(() => {
       if (!this.formField) return
       this.model.control.setValue(this.formField.value(), {
@@ -58,5 +59,7 @@ export class SignalInputDirective implements OnInit {
       emitViewToModelChange: false,
       emitModelToViewChange: true,
     }));
+
+    this.formField?.registerOnReset(value => this.model.control.setValue(value))
   }
 }
