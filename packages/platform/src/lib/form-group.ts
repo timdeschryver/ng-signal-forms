@@ -30,6 +30,7 @@ export type FormGroup<
   touchedState: Signal<TouchedState>;
   errors: Signal<{}>;
   errorsArray: Signal<InvalidDetails[]>;
+  markAllAsTouched: () => void;
 };
 
 export type FormGroupOptions = {
@@ -38,6 +39,14 @@ export type FormGroupOptions = {
   disabled?: () => boolean;
 };
 
+const markFormControlAsTouched = (f: any) => {
+  if (typeof f.markAsTouched === "function") {
+    f.markAsTouched();
+  }
+  if (typeof f.markAllAsTouched === "function") {
+    f.markAllAsTouched();
+  }
+}
 export function createFormGroup<
   Controls extends | { [p: string]: FormField | FormGroup }
     | WritableSignal<any[]>
@@ -136,5 +145,18 @@ export function createFormGroup<
 
       return 'UNTOUCHED';
     }),
+    markAllAsTouched: () => {
+      const fg =
+        typeof formGroup === 'function' && isSignal(formGroup)
+          ? formGroup()
+          : formGroup;
+
+      if (Array.isArray(fg)) {
+        fg.forEach(f => markFormControlAsTouched(f))
+        return;
+      }
+      Object.values(fg).forEach(f => markFormControlAsTouched(f))
+    }
+
   };
 }

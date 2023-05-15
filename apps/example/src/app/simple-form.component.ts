@@ -78,6 +78,8 @@ import { CustomErrorComponent } from './custom-input-error.component';
             <input ngModel [formField]="todo.controls.description" />
           </div>
         </div>
+
+        <button (click)="form.markAllAsTouched()">Mark all as touched</button>
       </div>
 
       <div>
