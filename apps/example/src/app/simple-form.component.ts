@@ -79,6 +79,7 @@ import { CustomErrorComponent } from './custom-input-error.component';
           </div>
         </div>
 
+        <button (click)="form.markAllAsTouched()">Mark all as touched</button>
         <button (click)="reset()">Reset form </button>
       </div>
 
