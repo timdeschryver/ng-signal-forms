@@ -31,6 +31,7 @@ export type FormGroup<
   errors: Signal<{}>;
   errorsArray: Signal<InvalidDetails[]>;
   markAllAsTouched: () => void;
+  reset: () => void;
 };
 
 export type FormGroupOptions = {
@@ -56,6 +57,8 @@ export function createFormGroup<
   injector?: Injector
 ): FormGroup<Controls> {
   const formGroup = formGroupCreator();
+  const initialArrayControls =
+    typeof formGroup === 'function' && isSignal(formGroup) ? [...formGroup()] : [];
 
   const valueSignal = computed(() => {
     const fg =
@@ -156,7 +159,21 @@ export function createFormGroup<
         return;
       }
       Object.values(fg).forEach(f => markFormControlAsTouched(f))
-    }
+    },
+    reset: () => {
+      const fg =
+        typeof formGroup === 'function' && isSignal(formGroup)
+          ? formGroup()
+          : formGroup;
 
+      if (Array.isArray(fg)) {
+        // need to create new array to set so change is not swallowed by equality of objects
+        (formGroup as WritableSignal<any[]>).set([...initialArrayControls]);
+        return;
+      }
+      return Object.values(fg).forEach(f => {
+        f.reset()
+      })
+    },
   };
 }
