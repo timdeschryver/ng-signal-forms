@@ -78,6 +78,8 @@ import { CustomErrorComponent } from './custom-input-error.component';
             <input ngModel [formField]="todo.controls.description" />
           </div>
         </div>
+
+        <button (click)="reset()">Reset form </button>
       </div>
 
       <div>
@@ -186,6 +188,10 @@ export default class SimpleFormComponent {
     this.form.controls.todos.controls.mutate((todos) =>
       todos.push(this.createTodo())
     );
+  }
+
+  reset() {
+    this.form.reset();
   }
 }
 
