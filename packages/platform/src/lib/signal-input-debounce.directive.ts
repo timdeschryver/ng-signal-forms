@@ -1,4 +1,4 @@
-import {Directive, forwardRef, Input, OnDestroy} from '@angular/core';
+import {Directive, forwardRef, Input, OnDestroy, Signal, WritableSignal} from '@angular/core';
 import {SIGNAL_INPUT_MODIFIER, SignalInputModifier} from "./signal-input-modifier.token";
 import {debounceTime, Subject, Subscription} from "rxjs";
 
@@ -14,24 +14,19 @@ export const DEBOUNCE_MODIFIER: any = {
   providers: [DEBOUNCE_MODIFIER]
 })
 export class SignalInputDebounceDirective implements SignalInputModifier, OnDestroy {
-  private _debounced = new Subject();
+  private _debounced = new Subject<unknown>();
   private _debouncedSub: Subscription | null = null;
+  private _signalToDebounce?: WritableSignal<unknown>
 
   @Input()
   set debounce(value: number) {
     this._debouncedSub?.unsubscribe();
     this._debouncedSub = this._debounced.pipe(debounceTime(value))
-      .subscribe(value => {
-        this.setSignal(value)
-      })
+      .subscribe(value => this._signalToDebounce?.set(value));
   }
 
-  // we replace this in the registerOnSet method with the set function passed by the SignalInputDirective
-  private setSignal(value: unknown): void {
-  }
-
-  public registerOnSet(set: (value: unknown) => void): void {
-    this.setSignal = set
+  public registerValueSignal(valueSignal: WritableSignal<unknown>): void {
+    this._signalToDebounce = valueSignal
   }
 
   public onModelChange(value: unknown): void {
