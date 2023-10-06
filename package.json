@@ -72,5 +72,11 @@
     "@nx/linter": "16.10.0",
     "@nx/jest": "16.10.0",
     "@nx/angular": "16.10.0"
+  },
+  "optionalDependencies": {
+    "@nx/nx-darwin-arm64": "16.5.1",
+    "@nx/nx-darwin-x64": "16.5.1",
+    "@nx/nx-linux-x64-gnu": "16.5.1",
+    "@nx/nx-win32-x64-msvc": "16.5.1"
   }
 }
