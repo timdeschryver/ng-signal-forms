@@ -25,6 +25,7 @@ export type FormGroup<
 > = {
   value: Signal<UnwrappedFormGroup<Controls>>;
   controls: { [K in keyof Controls]: Controls[K] };
+  valid: Signal<boolean>;
   state: Signal<ValidationState>;
   dirtyState: Signal<DirtyState>;
   touchedState: Signal<TouchedState>;
@@ -83,10 +84,7 @@ export function createFormGroup<
 
   const stateSignal = computeState(validateStateSignal);
 
-  return {
-    value: valueSignal,
-    controls: formGroup,
-    state: computed(() => {
+  const fgStateSignal = computed(() => {
       const fg =
         typeof formGroup === 'function' && isSignal(formGroup)
           ? formGroup()
@@ -101,7 +99,13 @@ export function createFormGroup<
         return 'PENDING';
       }
       return 'VALID';
-    }),
+    });
+
+  return {
+    value: valueSignal,
+    controls: formGroup,
+    state: fgStateSignal,
+    valid: computed(() => fgStateSignal() === 'VALID'),
     errors: computed(() => {
       return errorsSignal();
     }),

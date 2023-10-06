@@ -1,4 +1,4 @@
-import {effect, Injector, isSignal, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, effect, Injector, isSignal, signal, Signal, WritableSignal} from '@angular/core';
 import {
   computeErrors,
   computeErrorsArray,
@@ -19,6 +19,7 @@ export type FormField<Value = unknown> = {
   errors: Signal<ValidationErrors>;
   errorsArray: Signal<InvalidDetails[]>;
   state: Signal<ValidationState>;
+  valid: Signal<boolean>;
   dirtyState: Signal<DirtyState>;
   touchedState: Signal<TouchedState>;
   hidden: Signal<boolean>;
@@ -53,6 +54,7 @@ export function createFormField<Value>(
   const errorsArraySignal = computeErrorsArray(validateStateSignal);
 
   const stateSignal = computeState(validateStateSignal);
+  const validSignal = computed(() => stateSignal() === 'VALID')
 
   const touchedSignal = signal<TouchedState>('UNTOUCHED');
   const dirtySignal = signal<DirtyState>('PRISTINE');
@@ -96,6 +98,7 @@ export function createFormField<Value>(
     errors: errorsSignal,
     errorsArray: errorsArraySignal,
     state: stateSignal,
+    valid: validSignal,
     touchedState: touchedSignal,
     dirtyState: dirtySignal,
     hidden: hiddenSignal,
