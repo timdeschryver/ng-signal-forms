@@ -1,6 +1,6 @@
 {
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "example",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "generators": {},
   "sourceRoot": "apps/example/src",
@@ -11,17 +11,10 @@
         "outputPath": "dist/apps/example",
         "index": "apps/example/src/index.html",
         "main": "apps/example/src/main.ts",
-        "polyfills": [
-          "zone.js"
-        ],
+        "polyfills": ["zone.js"],
         "tsConfig": "apps/example/tsconfig.app.json",
-        "assets": [
-          "apps/example/src/favicon.ico",
-          "apps/example/src/assets"
-        ],
-        "styles": [
-          "apps/example/src/styles.css"
-        ],
+        "assets": ["apps/example/src/favicon.ico", "apps/example/src/assets"],
+        "styles": ["apps/example/src/styles.css"],
         "scripts": []
       },
       "configurations": {
@@ -50,9 +43,7 @@
         }
       },
       "defaultConfiguration": "production",
-      "outputs": [
-        "{options.outputPath}"
-      ]
+      "outputs": ["{options.outputPath}"]
     },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
@@ -75,18 +66,10 @@
     "test": {
       "executor": "@angular-devkit/build-angular:karma",
       "options": {
-        "polyfills": [
-          "zone.js",
-          "zone.js/testing"
-        ],
+        "polyfills": ["zone.js", "zone.js/testing"],
         "tsConfig": "apps/example/tsconfig.spec.json",
-        "assets": [
-          "apps/example/src/favicon.ico",
-          "apps/example/src/assets"
-        ],
-        "styles": [
-          "apps/example/src/styles.css"
-        ],
+        "assets": ["apps/example/src/favicon.ico", "apps/example/src/assets"],
+        "styles": ["apps/example/src/styles.css"],
         "scripts": []
       }
     }
