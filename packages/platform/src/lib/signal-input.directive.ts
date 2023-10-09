@@ -49,7 +49,7 @@ export class SignalInputDirective implements OnInit {
       if (this.modifiers.length !== 1) {
         throw Error('only one modifier per signal input field supported.')
       } else if (this.formField) {
-        this.modifiers[0].registerOnSet(this.formField.value.set)
+        this.modifiers[0].registerValueSignal(this.formField.value)
       }
     }
 
