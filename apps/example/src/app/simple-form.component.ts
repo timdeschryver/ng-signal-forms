@@ -90,7 +90,8 @@ import { CustomErrorComponent } from './custom-input-error.component';
             {
               state: form.state(),
               dirtyState: form.dirtyState(),
-              touchedState: form.touchedState()
+              touchedState: form.touchedState(),
+              valid: form.valid()
             } | json
           }}
     </pre>
