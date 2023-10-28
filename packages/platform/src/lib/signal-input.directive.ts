@@ -9,9 +9,13 @@ import {SIGNAL_INPUT_MODIFIER, SignalInputModifier} from "./signal-input-modifie
   host: {
     '(ngModelChange)': 'onModelChange($event)',
     '(blur)': 'onBlur()',
-    '[class.control-valid]': 'this.formField?.state() === "VALID"',
-    '[class.control-invalid]': 'this.formField?.state() === "INVALID"',
-    '[class.control-pending]': 'this.formField?.state() === "PENDING"',
+    '[class.ng-valid]': 'this.formField?.state() === "VALID"',
+    '[class.ng-invalid]': 'this.formField?.state() === "INVALID"',
+    '[class.ng-pending]': 'this.formField?.state() === "PENDING"',
+    '[class.ng-pristine]': 'this.formField?.dirtyState() === "PRISTINE"',
+    '[class.ng-dirty]': 'this.formField?.dirtyState() === "DIRTY"',
+    '[class.ng-touched]': 'this.formField?.touchedState() === "TOUCHED"',
+    '[class.ng-untouched]': 'this.formField?.touchedState() === "UNTOUCHED"',
   },
 })
 export class SignalInputDirective implements OnInit {
