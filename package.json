@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "nx serve example",
+    "start": "nx serve example --host 0.0.0.0",
     "build": "nx run-many --target=build --all",
     "watch": "nx build --watch --configuration development",
     "test": "nx test",

@@ -1,13 +1,6 @@
-import {
-  Component,
-  inject,
-  Signal,
-  signal,
-  WritableSignal,
-} from '@angular/core';
+import { Component, inject, Signal } from '@angular/core';
 import {
   FormField,
-  FormGroup,
   SetValidationState,
   SignalFormBuilder,
   SignalInputDebounceDirective,
@@ -19,7 +12,7 @@ import {
 } from '@ng-signal-forms';
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CustomErrorComponent } from './custom-input-error.component';
+import { CustomErrorComponent } from '../custom-input-error.component';
 
 @Component({
   selector: 'app-simple-form',
@@ -158,9 +151,9 @@ export default class SimpleFormComponent {
           ),
         };
       }),
-      todos: this.sfb.createFormGroup<WritableSignal<FormGroup<Todo>[]>>(
+      todos: this.sfb.createFormGroup<Todo[]>(
         () => {
-          return signal([]);
+          return [];
         },
         {
           validators: [V.minLength(1)],
@@ -187,8 +180,10 @@ export default class SimpleFormComponent {
   };
 
   addTodo() {
-    this.form.controls.todos
-      .controls.update(todos => [...todos, this.createTodo()]);
+    this.form.controls.todos.controls.update((todos) => [
+      ...todos,
+      this.createTodo(),
+    ]);
   }
 
   reset() {

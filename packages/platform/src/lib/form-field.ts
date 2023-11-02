@@ -1,4 +1,12 @@
-import {computed, effect, Injector, isSignal, signal, Signal, WritableSignal} from '@angular/core';
+import {
+  computed,
+  effect,
+  Injector,
+  isSignal,
+  signal,
+  Signal,
+  WritableSignal,
+} from '@angular/core';
 import {
   computeErrors,
   computeErrorsArray,
@@ -15,6 +23,7 @@ export type DirtyState = 'PRISTINE' | 'DIRTY';
 export type TouchedState = 'TOUCHED' | 'UNTOUCHED';
 
 export type FormField<Value = unknown> = {
+  __type: 'FormField';
   value: WritableSignal<Value>;
   errors: Signal<ValidationErrors>;
   errorsArray: Signal<InvalidDetails[]>;
@@ -27,7 +36,7 @@ export type FormField<Value = unknown> = {
   markAsTouched: () => void;
   markAsDirty: () => void;
   reset: () => void;
-  registerOnReset: (fn: (value: Value) => void) => void
+  registerOnReset: (fn: (value: Value) => void) => void;
 };
 
 export type FormFieldOptions = {
@@ -35,7 +44,7 @@ export type FormFieldOptions = {
   hidden?: () => boolean;
   disabled?: () => boolean;
 };
-export type FormFieldOptionsCreator<T> = (value: Signal<T>) => FormFieldOptions
+export type FormFieldOptionsCreator<T> = (value: Signal<T>) => FormFieldOptions;
 
 export function createFormField<Value>(
   value: Value | WritableSignal<Value>,
@@ -44,56 +53,72 @@ export function createFormField<Value>(
 ): FormField<Value> {
   const valueSignal =
     // needed until types for writable signal are fixed
-    (typeof value === 'function' && isSignal(value) ? value : signal(value)) as WritableSignal<Value>;
-  const finalOptions = options && typeof options === 'function' ? options(valueSignal) : options;
+    (
+      typeof value === 'function' && isSignal(value) ? value : signal(value)
+    ) as WritableSignal<Value>;
+  const finalOptions =
+    options && typeof options === 'function' ? options(valueSignal) : options;
 
-  const validatorsSignal = computeValidators(valueSignal, finalOptions?.validators, injector);
+  const validatorsSignal = computeValidators(
+    valueSignal,
+    finalOptions?.validators,
+    injector
+  );
   const validateStateSignal = computeValidateState(validatorsSignal);
 
   const errorsSignal = computeErrors(validateStateSignal);
   const errorsArraySignal = computeErrorsArray(validateStateSignal);
 
   const stateSignal = computeState(validateStateSignal);
-  const validSignal = computed(() => stateSignal() === 'VALID')
+  const validSignal = computed(() => stateSignal() === 'VALID');
 
   const touchedSignal = signal<TouchedState>('UNTOUCHED');
   const dirtySignal = signal<DirtyState>('PRISTINE');
   const hiddenSignal = signal(false);
   const disabledSignal = signal(false);
 
-  effect(() => {
-    if (valueSignal()) {
-      dirtySignal.set('DIRTY');
+  effect(
+    () => {
+      if (valueSignal()) {
+        dirtySignal.set('DIRTY');
+      }
+    },
+    {
+      allowSignalWrites: true,
+      injector: injector,
     }
-  }, {
-    allowSignalWrites: true,
-    injector: injector
-  });
+  );
 
   if (finalOptions?.hidden) {
-    effect(() => {
+    effect(
+      () => {
         hiddenSignal.set(finalOptions!.hidden!());
       },
       {
         allowSignalWrites: true,
-        injector: injector
-      });
+        injector: injector,
+      }
+    );
   }
 
   if (finalOptions?.disabled) {
-    effect(() => {
+    effect(
+      () => {
         disabledSignal.set(finalOptions!.disabled!());
       },
       {
         allowSignalWrites: true,
-        injector: injector
-      });
+        injector: injector,
+      }
+    );
   }
 
-  const defaultValue = typeof value === 'function' && isSignal(value) ? value() :value;
-  let onReset = (value: Value) => {}
+  const defaultValue =
+    typeof value === 'function' && isSignal(value) ? value() : value;
+  let onReset = (_value: Value) => {};
 
   return {
+    __type: 'FormField',
     value: valueSignal,
     errors: errorsSignal,
     errorsArray: errorsArraySignal,
@@ -105,12 +130,12 @@ export function createFormField<Value>(
     disabled: disabledSignal,
     markAsTouched: () => touchedSignal.set('TOUCHED'),
     markAsDirty: () => dirtySignal.set('DIRTY'),
-    registerOnReset: (fn: (value: Value) => void) => onReset = fn,
+    registerOnReset: (fn: (value: Value) => void) => (onReset = fn),
     reset: () => {
       valueSignal.set(defaultValue);
       touchedSignal.set('UNTOUCHED');
       dirtySignal.set('PRISTINE');
       onReset(defaultValue);
-    }
+    },
   };
 }
