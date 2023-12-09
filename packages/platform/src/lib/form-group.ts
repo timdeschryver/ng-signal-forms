@@ -1,5 +1,12 @@
-import {computed, Injector, isSignal, Signal, WritableSignal} from '@angular/core';
-import {DirtyState, FormField, TouchedState} from './form-field';
+import {
+  computed,
+  Injector,
+  isSignal,
+  signal,
+  Signal,
+  WritableSignal,
+} from '@angular/core';
+import { createFormField, DirtyState, TouchedState } from './form-field';
 import {
   computeErrors,
   computeErrorsArray,
@@ -10,21 +17,17 @@ import {
   ValidationState,
   Validator,
 } from './validation';
+import {
+  FormGroupCreator,
+  UnwrappedFormGroup,
+  FormGroupFields,
+  FormGroupCreatorOrSignal,
+} from './models';
 
-export type UnwrappedFormGroup<Controls> = {
-  [K in keyof Controls]: Controls[K] extends FormField<infer V>
-    ? V
-    : Controls[K] extends FormGroup<infer G>
-      ? UnwrappedFormGroup<G>
-      : never;
-};
-
-export type FormGroup<
-  Controls extends | { [p: string]: FormField | FormGroup }
-    | WritableSignal<any[]> = {}
-> = {
-  value: Signal<UnwrappedFormGroup<Controls>>;
-  controls: { [K in keyof Controls]: Controls[K] };
+export type FormGroup<Fields extends FormGroupCreatorOrSignal = {}> = {
+  __type: 'FormGroup';
+  value: Signal<UnwrappedFormGroup<Fields>>;
+  controls: FormGroupFields<Fields>;
   valid: Signal<boolean>;
   state: Signal<ValidationState>;
   dirtyState: Signal<DirtyState>;
@@ -42,30 +45,41 @@ export type FormGroupOptions = {
 };
 
 const markFormControlAsTouched = (f: any) => {
-  if (typeof f.markAsTouched === "function") {
+  if (typeof f.markAsTouched === 'function') {
     f.markAsTouched();
   }
-  if (typeof f.markAllAsTouched === "function") {
+  if (typeof f.markAllAsTouched === 'function') {
     f.markAllAsTouched();
   }
-}
-export function createFormGroup<
-  Controls extends | { [p: string]: FormField | FormGroup }
-    | WritableSignal<any[]>
->(
-  formGroupCreator: () => Controls,
+};
+export function createFormGroup<FormFields extends FormGroupCreator>(
+  formGroupCreator: FormFields | (() => FormFields),
   options?: FormGroupOptions,
   injector?: Injector
-): FormGroup<Controls> {
-  const formGroup = formGroupCreator();
-  const initialArrayControls =
-    typeof formGroup === 'function' && isSignal(formGroup) ? [...formGroup()] : [];
+): FormGroup<FormFields> {
+  const formGroup: FormFields =
+    typeof formGroupCreator === 'function'
+      ? formGroupCreator()
+      : formGroupCreator;
+
+  const formFieldsMapOrSignal = Array.isArray(formGroup)
+    ? signal(formGroup as any[])
+    : Object.entries(formGroup).reduce((acc, [key, value]: [string, any]) => {
+        (acc as any)[key] =
+          value?.__type === 'FormGroup' || value?.__type === 'FormField'
+            ? value
+            : createFormField(value);
+        return acc;
+      }, {} as FormGroupFields<FormFields>);
+
+  const initialArrayControls = isSignal(formFieldsMapOrSignal)
+    ? [...formFieldsMapOrSignal()]
+    : [];
 
   const valueSignal = computed(() => {
-    const fg =
-      typeof formGroup === 'function' && isSignal(formGroup)
-        ? formGroup()
-        : formGroup;
+    const fg = isSignal(formFieldsMapOrSignal)
+      ? formFieldsMapOrSignal()
+      : formFieldsMapOrSignal;
 
     if (Array.isArray(fg)) {
       return fg.map((f) => f.value());
@@ -75,8 +89,11 @@ export function createFormGroup<
       return acc;
     }, {} as any);
   });
-
-  const validatorsSignal = computeValidators(valueSignal, options?.validators, injector);
+  const validatorsSignal = computeValidators(
+    valueSignal,
+    options?.validators,
+    injector
+  );
   const validateStateSignal = computeValidateState(validatorsSignal);
 
   const errorsSignal = computeErrors(validateStateSignal);
@@ -85,25 +102,25 @@ export function createFormGroup<
   const stateSignal = computeState(validateStateSignal);
 
   const fgStateSignal = computed(() => {
-      const fg =
-        typeof formGroup === 'function' && isSignal(formGroup)
-          ? formGroup()
-          : formGroup;
-      const states = Object.values(fg)
-        .map((field) => field.state())
-        .concat(stateSignal());
-      if (states.some((state) => state === 'INVALID')) {
-        return 'INVALID';
-      }
-      if (states.some((state) => state === 'PENDING')) {
-        return 'PENDING';
-      }
-      return 'VALID';
-    });
+    const fg = isSignal(formFieldsMapOrSignal)
+      ? formFieldsMapOrSignal()
+      : formFieldsMapOrSignal;
+    const states = Object.values(fg)
+      .map((field) => field.state())
+      .concat(stateSignal());
+    if (states.some((state) => state === 'INVALID')) {
+      return 'INVALID';
+    }
+    if (states.some((state) => state === 'PENDING')) {
+      return 'PENDING';
+    }
+    return 'VALID';
+  });
 
   return {
+    __type: 'FormGroup',
     value: valueSignal,
-    controls: formGroup,
+    controls: formFieldsMapOrSignal as any,
     state: fgStateSignal,
     valid: computed(() => fgStateSignal() === 'VALID'),
     errors: computed(() => {
@@ -111,22 +128,20 @@ export function createFormGroup<
     }),
     errorsArray: computed(() => {
       const myErrors = errorsArraySignal();
-      const fg =
-        typeof formGroup === 'function' && isSignal(formGroup)
-          ? formGroup()
-          : formGroup;
+      const fg = isSignal(formFieldsMapOrSignal)
+        ? formFieldsMapOrSignal()
+        : formFieldsMapOrSignal;
       const childErrors = Object.entries(fg).map(([key, f]) => {
         return (f as any)
           .errorsArray()
-          .map((e: any) => ({...e, path: e.path ? key + '.' + e.path : key}));
+          .map((e: any) => ({ ...e, path: e.path ? key + '.' + e.path : key }));
       });
       return myErrors.concat(...childErrors);
     }),
     dirtyState: computed(() => {
-      const fg =
-        typeof formGroup === 'function' && isSignal(formGroup)
-          ? formGroup()
-          : formGroup;
+      const fg = isSignal(formFieldsMapOrSignal)
+        ? formFieldsMapOrSignal()
+        : formFieldsMapOrSignal;
 
       const states = Object.values(fg).map((f) => f.dirtyState());
 
@@ -138,10 +153,9 @@ export function createFormGroup<
       return 'PRISTINE';
     }),
     touchedState: computed(() => {
-      const fg =
-        typeof formGroup === 'function' && isSignal(formGroup)
-          ? formGroup()
-          : formGroup;
+      const fg = isSignal(formFieldsMapOrSignal)
+        ? formFieldsMapOrSignal()
+        : formFieldsMapOrSignal;
 
       const states = Object.values(fg).map((f) => f.touchedState());
 
@@ -153,31 +167,31 @@ export function createFormGroup<
       return 'UNTOUCHED';
     }),
     markAllAsTouched: () => {
-      const fg =
-        typeof formGroup === 'function' && isSignal(formGroup)
-          ? formGroup()
-          : formGroup;
+      const fg = isSignal(formFieldsMapOrSignal)
+        ? formFieldsMapOrSignal()
+        : formFieldsMapOrSignal;
 
       if (Array.isArray(fg)) {
-        fg.forEach(f => markFormControlAsTouched(f))
+        fg.forEach((f) => markFormControlAsTouched(f));
         return;
       }
-      Object.values(fg).forEach(f => markFormControlAsTouched(f))
+      Object.values(fg).forEach((f) => markFormControlAsTouched(f));
     },
     reset: () => {
-      const fg =
-        typeof formGroup === 'function' && isSignal(formGroup)
-          ? formGroup()
-          : formGroup;
+      const fg = isSignal(formFieldsMapOrSignal)
+        ? formFieldsMapOrSignal()
+        : formFieldsMapOrSignal;
 
       if (Array.isArray(fg)) {
         // need to create new array to set so change is not swallowed by equality of objects
-        (formGroup as WritableSignal<any[]>).set([...initialArrayControls]);
+        (formFieldsMapOrSignal as WritableSignal<any[]>).set([
+          ...initialArrayControls,
+        ]);
         return;
       }
-      return Object.values(fg).forEach(f => {
-        f.reset()
-      })
+      return Object.values(fg).forEach((f) => {
+        f.reset();
+      });
     },
   };
 }

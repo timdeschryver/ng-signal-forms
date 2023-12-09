@@ -1,15 +1,15 @@
-import {Component} from '@angular/core';
-import {RouterLink, RouterOutlet} from "@angular/router";
+import { Component } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [
-    RouterLink,
-    RouterOutlet
-  ],
+  imports: [RouterLink, RouterOutlet],
   template: `
     <nav class="mainNav">
       <ul>
+        <li>
+          <a routerLink="basic-form">Basic form</a>
+        </li>
         <li>
           <a routerLink="simple-form">Simple form</a>
         </li>
@@ -18,7 +18,7 @@ import {RouterLink, RouterOutlet} from "@angular/router";
         </li>
       </ul>
     </nav>
-    <router-outlet/>
+    <router-outlet />
   `,
   standalone: true,
 })

@@ -1,17 +1,21 @@
-import {Routes} from "@angular/router";
+import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'simple-form',
-    pathMatch: 'full'
+    redirectTo: 'basic-form',
+    pathMatch: 'full',
+  },
+  {
+    path: 'basic-form',
+    loadComponent: () => import('./basic-form/basic-form.component'),
   },
   {
     path: 'simple-form',
-    loadComponent: () => import('./simple-form.component')
+    loadComponent: () => import('./simple-form/simple-form.component'),
   },
   {
     path: 'multi-page-form',
-    loadChildren: () => import('./multi-page-form/multi-page-form.routes')
-  }
+    loadChildren: () => import('./multi-page-form/multi-page-form.routes'),
+  },
 ];
