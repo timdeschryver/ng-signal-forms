@@ -30,7 +30,9 @@ export type FormField<Value = unknown> = {
   state: Signal<ValidationState>;
   valid: Signal<boolean>;
   dirtyState: Signal<DirtyState>;
+  dirty: Signal<boolean>;
   touchedState: Signal<TouchedState>;
+  touched: Signal<boolean>;
   hidden: Signal<boolean>;
   disabled: Signal<boolean>;
   markAsTouched: () => void;
@@ -72,15 +74,17 @@ export function createFormField<Value>(
   const stateSignal = computeState(validateStateSignal);
   const validSignal = computed(() => stateSignal() === 'VALID');
 
-  const touchedSignal = signal<TouchedState>('UNTOUCHED');
-  const dirtySignal = signal<DirtyState>('PRISTINE');
+  const touchedStateSignal = signal<TouchedState>('UNTOUCHED');
+  const touchedSignal = computed(() => touchedStateSignal() === 'TOUCHED');
+  const dirtyStateSignal = signal<DirtyState>('PRISTINE');
+  const dirtySignal = computed(() => dirtyStateSignal() === 'DIRTY');
   const hiddenSignal = signal(false);
   const disabledSignal = signal(false);
 
   effect(
     () => {
       if (valueSignal()) {
-        dirtySignal.set('DIRTY');
+        dirtyStateSignal.set('DIRTY');
       }
     },
     {
@@ -124,17 +128,19 @@ export function createFormField<Value>(
     errorsArray: errorsArraySignal,
     state: stateSignal,
     valid: validSignal,
-    touchedState: touchedSignal,
-    dirtyState: dirtySignal,
+    touchedState: touchedStateSignal,
+    touched: touchedSignal,
+    dirtyState: dirtyStateSignal,
+    dirty: dirtySignal,
     hidden: hiddenSignal,
     disabled: disabledSignal,
-    markAsTouched: () => touchedSignal.set('TOUCHED'),
-    markAsDirty: () => dirtySignal.set('DIRTY'),
+    markAsTouched: () => touchedStateSignal.set('TOUCHED'),
+    markAsDirty: () => dirtyStateSignal.set('DIRTY'),
     registerOnReset: (fn: (value: Value) => void) => (onReset = fn),
     reset: () => {
       valueSignal.set(defaultValue);
-      touchedSignal.set('UNTOUCHED');
-      dirtySignal.set('PRISTINE');
+      touchedStateSignal.set('UNTOUCHED');
+      dirtyStateSignal.set('PRISTINE');
       onReset(defaultValue);
     },
   };

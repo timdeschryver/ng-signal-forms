@@ -7,14 +7,14 @@ import { injectErrorField } from '@ng-signal-forms';
   standalone: true,
   imports: [NgIf, NgFor, JsonPipe],
   template: `
-    <div *ngIf="touchedState() === 'TOUCHED'">
+    <div *ngIf="touched()">
       <p *ngFor="let message of errorMessages()">{{ message }}</p>
     </div>
   `,
 })
 export class CustomErrorComponent {
   private _formField = injectErrorField();
-  public touchedState = this._formField.touchedState;
+  public touched = this._formField.touched;
   public errors = this._formField.errors;
 
   public errorMessages = computed(() =>
