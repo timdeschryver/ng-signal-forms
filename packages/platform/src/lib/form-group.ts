@@ -31,7 +31,9 @@ export type FormGroup<Fields extends FormGroupCreatorOrSignal = {}> = {
   valid: Signal<boolean>;
   state: Signal<ValidationState>;
   dirtyState: Signal<DirtyState>;
+  dirty: Signal<boolean>;
   touchedState: Signal<TouchedState>;
+  touched: Signal<boolean>;
   errors: Signal<{}>;
   errorsArray: Signal<InvalidDetails[]>;
   markAllAsTouched: () => void;
@@ -117,6 +119,38 @@ export function createFormGroup<FormFields extends FormGroupCreator>(
     return 'VALID';
   });
 
+  const dirtyStateSignal = computed(() => {
+    const fg = isSignal(formFieldsMapOrSignal)
+      ? formFieldsMapOrSignal()
+      : formFieldsMapOrSignal;
+
+    const states = Object.values(fg).map((f) => f.dirtyState());
+
+    const isDirty = states.some((e) => e === 'DIRTY');
+    if (isDirty) {
+      return 'DIRTY';
+    }
+
+    return 'PRISTINE';
+  })
+  const dirtySignal = computed(() => dirtyStateSignal() === 'DIRTY');
+
+  const touchedStateSignal = computed(() => {
+    const fg = isSignal(formFieldsMapOrSignal)
+      ? formFieldsMapOrSignal()
+      : formFieldsMapOrSignal;
+
+    const states = Object.values(fg).map((f) => f.touchedState());
+
+    const isTouched = states.some((e) => e === 'TOUCHED');
+    if (isTouched) {
+      return 'TOUCHED';
+    }
+
+    return 'UNTOUCHED';
+  })
+  const touchedSignal = computed(() => touchedStateSignal() === 'TOUCHED');
+
   return {
     __type: 'FormGroup',
     value: valueSignal,
@@ -138,34 +172,10 @@ export function createFormGroup<FormFields extends FormGroupCreator>(
       });
       return myErrors.concat(...childErrors);
     }),
-    dirtyState: computed(() => {
-      const fg = isSignal(formFieldsMapOrSignal)
-        ? formFieldsMapOrSignal()
-        : formFieldsMapOrSignal;
-
-      const states = Object.values(fg).map((f) => f.dirtyState());
-
-      const isDirty = states.some((e) => e === 'DIRTY');
-      if (isDirty) {
-        return 'DIRTY';
-      }
-
-      return 'PRISTINE';
-    }),
-    touchedState: computed(() => {
-      const fg = isSignal(formFieldsMapOrSignal)
-        ? formFieldsMapOrSignal()
-        : formFieldsMapOrSignal;
-
-      const states = Object.values(fg).map((f) => f.touchedState());
-
-      const isTouched = states.some((e) => e === 'TOUCHED');
-      if (isTouched) {
-        return 'TOUCHED';
-      }
-
-      return 'UNTOUCHED';
-    }),
+    dirtyState: dirtyStateSignal,
+    dirty: dirtySignal,
+    touchedState: touchedStateSignal,
+    touched: touchedSignal,
     markAllAsTouched: () => {
       const fg = isSignal(formFieldsMapOrSignal)
         ? formFieldsMapOrSignal()
