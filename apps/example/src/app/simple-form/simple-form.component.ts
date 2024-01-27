@@ -27,6 +27,12 @@ import { CustomErrorComponent } from '../custom-input-error.component';
             [debounce]="700"
             [formField]="form.controls.username"
           />
+          @if(form.controls.username.hasError('required')) {
+            <small>
+                Username is required
+            </small>
+          }
+
         </div>
 
         <div>

@@ -91,7 +91,7 @@ export function computeValidateState(
   return computed(() => validateSignal().map((v) => v()));
 }
 
-export function computeErrors(validateSignal: Signal<ValidateState[]>) {
+export function computeErrors(validateSignal: Signal<ValidateState[]>): Signal<Record<string, ValidationError>> {
   return computed(() => {
     return validateSignal().reduce((acc, errors) => {
       if (!errors.errors) {
