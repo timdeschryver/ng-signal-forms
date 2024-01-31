@@ -66,7 +66,7 @@ import { CustomErrorComponent } from '../custom-input-error.component';
           <button (click)="addTodo()">Add todo</button>
           <small>{{ form.controls.todos.errors() | json }}</small>
 
-          <div *ngFor="let todo of $any(form.controls.todos.controls)()">
+          <div *ngFor="let todo of form.controls.todos.controls()">
             <label>Todo</label>
             <small>{{ todo.controls.description.errors() | json }}</small>
             <input

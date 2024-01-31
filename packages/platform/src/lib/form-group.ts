@@ -27,7 +27,7 @@ import {
 export type FormGroup<Fields extends FormGroupCreatorOrSignal = {}> = {
   __type: 'FormGroup';
   value: Signal<UnwrappedFormGroup<Fields>>;
-  controls: FormGroupFields<Fields>;
+  controls: Fields extends WritableSignal<FormGroup<infer FG>[]> ? WritableSignal<FormGroup<FG>[]> : FormGroupFields<Fields>;
   valid: Signal<boolean>;
   state: Signal<ValidationState>;
   dirtyState: Signal<DirtyState>;
