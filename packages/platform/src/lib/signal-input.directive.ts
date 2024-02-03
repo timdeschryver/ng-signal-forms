@@ -45,7 +45,7 @@ export class SignalInputDirective implements OnInit {
         emitViewToModelChange: false,
         emitModelToViewChange: true,
       });
-    });
+    }, {allowSignalWrites: true});
   }
 
   public ngOnInit() {
