@@ -35,6 +35,7 @@ export type FormField<Value = unknown> = {
   touched: Signal<boolean>;
   hidden: Signal<boolean>;
   disabled: Signal<boolean>;
+  readOnly: Signal<boolean>;
   markAsTouched: () => void;
   markAsDirty: () => void;
   reset: () => void;
@@ -46,6 +47,7 @@ export type FormFieldOptions = {
   validators?: Validator<any>[];
   hidden?: () => boolean;
   disabled?: () => boolean;
+  readOnly?: () => boolean;
 };
 export type FormFieldOptionsCreator<T> = (value: Signal<T>) => FormFieldOptions;
 
@@ -81,6 +83,7 @@ export function createFormField<Value>(
   const dirtySignal = computed(() => dirtyStateSignal() === 'DIRTY');
   const hiddenSignal = signal(false);
   const disabledSignal = signal(false);
+  const readOnlySignal = signal(false);
 
   effect(
     () => {
@@ -118,6 +121,18 @@ export function createFormField<Value>(
     );
   }
 
+  if (finalOptions?.readOnly) {
+    effect(
+      () => {
+        readOnlySignal.set(finalOptions!.readOnly!());
+      },
+      {
+        allowSignalWrites: true,
+        injector: injector,
+      }
+    );
+  }
+
   const defaultValue =
     typeof value === 'function' && isSignal(value) ? value() : value;
   let onReset = (_value: Value) => {};
@@ -135,6 +150,7 @@ export function createFormField<Value>(
     dirty: dirtySignal,
     hidden: hiddenSignal,
     disabled: disabledSignal,
+    readOnly: readOnlySignal,
     markAsTouched: () => touchedStateSignal.set('TOUCHED'),
     markAsDirty: () => dirtyStateSignal.set('DIRTY'),
     hasError: (errorKey: string) => !!errorsSignal()[errorKey],

@@ -42,6 +42,8 @@ import { CustomErrorComponent } from '../custom-input-error.component';
           }}</small>
           <input
             ngModel
+            [disabled]="form.controls.passwords.controls.password.disabled()"
+            [readonly]="form.controls.passwords.controls.password.readOnly()"
             [formField]="form.controls.passwords.controls.password"
           />
         </div>
@@ -142,7 +144,9 @@ export default class SimpleFormComponent {
                 } characters or change '${pw().substring(0, 3)}' to rob`,
             },
           ],
-        }));
+          readOnly: () => username.value() === 'readonly',
+          disabled: () => username.value() === 'disabled',
+        }))
 
         return {
           password,
