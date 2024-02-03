@@ -1,7 +1,7 @@
-import {Directive, effect, inject, Input, OnInit} from '@angular/core';
-import {NgModel} from '@angular/forms';
-import {FormField} from './form-field';
-import {SIGNAL_INPUT_MODIFIER, SignalInputModifier} from "./signal-input-modifier.token";
+import { Directive, effect, inject, Input, OnInit } from '@angular/core';
+import { NgModel } from '@angular/forms';
+import { FormField } from './form-field';
+import { SIGNAL_INPUT_MODIFIER, SignalInputModifier } from "./signal-input-modifier.token";
 
 @Directive({
   selector: '[ngModel][formField]',
@@ -16,6 +16,8 @@ import {SIGNAL_INPUT_MODIFIER, SignalInputModifier} from "./signal-input-modifie
     '[class.ng-dirty]': 'this.formField?.dirtyState() === "DIRTY"',
     '[class.ng-touched]': 'this.formField?.touchedState() === "TOUCHED"',
     '[class.ng-untouched]': 'this.formField?.touchedState() === "UNTOUCHED"',
+    '[attr.disabled]': '!propagateState ? undefined : this.formField?.disabled() ? true : undefined',
+    '[attr.readonly]': '!propagateState ? undefined : this.formField?.readOnly() ? true : undefined',
   },
 })
 export class SignalInputDirective implements OnInit {
@@ -23,6 +25,7 @@ export class SignalInputDirective implements OnInit {
   private readonly model = inject(NgModel);
 
   @Input() formField: FormField | null = null;
+  @Input() propagateState = true;
 
   onModelChange(value: unknown) {
     if (this.modifiers && this.modifiers.length === 1) {
