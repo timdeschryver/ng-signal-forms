@@ -203,6 +203,10 @@ export function createFormGroup<FormFields extends FormGroupCreator>(
         (formFieldsMapOrSignal as WritableSignal<any[]>).set([
           ...initialArrayControls,
         ]);
+        
+        for (const ctrl of initialArrayControls) {
+          ctrl.reset();
+        }
         return;
       }
       return Object.values(fg).forEach((f) => {
