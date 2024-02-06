@@ -29,6 +29,8 @@ export type FormGroup<Fields extends FormGroupCreatorOrSignal = {}> = {
   value: Signal<UnwrappedFormGroup<Fields>>;
   controls: Fields extends WritableSignal<FormGroup<infer G>[]> 
     ? FormGroupFields<Fields> & WritableSignal<FormGroup<G>[]> 
+    : Fields extends WritableSignal<infer F> 
+    ? FormGroupFields<Fields> & WritableSignal<F> 
     : FormGroupFields<Fields>;
   valid: Signal<boolean>;
   state: Signal<ValidationState>;

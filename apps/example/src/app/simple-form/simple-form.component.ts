@@ -63,7 +63,16 @@ import { CustomErrorComponent } from '../custom-input-error.component';
           />
         </div>
 
-        <div>
+        <fieldset>
+          <legend>Team members</legend>
+          <div *ngFor="let member of form.controls.team.controls(); let i = index;">
+              <label for="member-{{i}}">Member</label>
+              <input ngModel [formField]="member" id="member-{{i}}" />
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Todos</legend>
           <button (click)="addTodo()">Add todo</button>
           <small>{{ form.controls.todos.errors() | json }}</small>
 
@@ -77,7 +86,7 @@ import { CustomErrorComponent } from '../custom-input-error.component';
             />
             <input ngModel [formField]="todo.controls.description" />
           </div>
-        </div>
+        </fieldset>
 
         <button (click)="form.markAllAsTouched()">Mark all as touched</button>
         <button (click)="reset()">Reset form</button>
@@ -168,7 +177,14 @@ export default class SimpleFormComponent {
           validators: [V.minLength(1)],
         }
       ),
+      
+      team:  this.sfb.createFormGroup([
+        this.sfb.createFormField(''),
+        this.sfb.createFormField(''),
+        this.sfb.createFormField(''),
+      ]),
     };
+    
   });
 
   createTodo = () => {
