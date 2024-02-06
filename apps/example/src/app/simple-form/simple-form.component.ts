@@ -1,6 +1,7 @@
 import { Component, inject, Signal } from '@angular/core';
 import {
   FormField,
+  FormGroup,
   SetValidationState,
   SignalFormBuilder,
   SignalInputDebounceDirective,
@@ -159,7 +160,7 @@ export default class SimpleFormComponent {
           ),
         };
       }),
-      todos: this.sfb.createFormGroup<Todo[]>(
+      todos: this.sfb.createFormGroup<FormGroup<Todo>[]>(
         () => {
           return [];
         },

@@ -18,7 +18,7 @@ export type FormGroupFields<Fields extends FormGroupCreatorOrSignal> = {
     ? FormField<Fields[K]>
     : Fields[K] extends FormGroup<infer G>
     ? G extends unknown[]
-      ? FormGroup<WritableSignal<FormGroup<G[0]>[]>>
+      ? FormGroup<WritableSignal<G[0][]>>
       : Fields[K]
     : Fields[K];
 };
