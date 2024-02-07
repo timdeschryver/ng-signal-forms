@@ -41,6 +41,7 @@ export type FormGroup<Fields extends FormGroupCreatorOrSignal = {}> = {
   errors: Signal<{}>;
   errorsArray: Signal<InvalidDetails[]>;
   hasError: (errorKey: string) => boolean;
+  errorMessage: (errorKey: string) => string | undefined;
   markAllAsTouched: () => void;
   reset: () => void;
 };
@@ -178,6 +179,7 @@ export function createFormGroup<FormFields extends FormGroupCreator>(
       return myErrors.concat(...childErrors);
     }),
     hasError: (errorKey: string) => !!errorsSignal()[errorKey],
+    errorMessage: (errorKey: string) => errorsArraySignal().find(e => e.key === errorKey)?.message,
     dirtyState: dirtyStateSignal,
     dirty: dirtySignal,
     touchedState: touchedStateSignal,

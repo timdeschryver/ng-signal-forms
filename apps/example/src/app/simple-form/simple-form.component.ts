@@ -45,6 +45,13 @@ import { CustomErrorComponent } from '../custom-input-error.component';
             ngModel
             [formField]="form.controls.passwords.controls.password"
           />
+          
+          @if(form.controls.passwords.hasError('minLength')) {
+            <small>
+                {{ form.controls.passwords.errorMessage('minLength') }}
+            </small>
+          }
+
         </div>
 
         <div

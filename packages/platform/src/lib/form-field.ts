@@ -40,6 +40,7 @@ export type FormField<Value = unknown> = {
   markAsDirty: () => void;
   reset: () => void;
   hasError: (errorKey: string) => boolean;
+  errorMessage: (errorKey: string) => string | undefined,
   registerOnReset: (fn: (value: Value) => void) => void;
 };
 
@@ -154,6 +155,7 @@ export function createFormField<Value>(
     markAsTouched: () => touchedStateSignal.set('TOUCHED'),
     markAsDirty: () => dirtyStateSignal.set('DIRTY'),
     hasError: (errorKey: string) => !!errorsSignal()[errorKey],
+    errorMessage: (errorKey: string) => errorsArraySignal().find(e => e.key === errorKey)?.message,
     registerOnReset: (fn: (value: Value) => void) => (onReset = fn),
     reset: () => {
       valueSignal.set(defaultValue);
