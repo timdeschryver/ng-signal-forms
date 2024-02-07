@@ -86,11 +86,14 @@ export function createFormField<Value>(
   const disabledSignal = signal(false);
   const readOnlySignal = signal(false);
 
+  let previousValue: unknown|undefined = undefined;
   effect(
     () => {
-      if (valueSignal()) {
+      const newValue = valueSignal();
+      if (previousValue !== undefined && newValue !== previousValue) {
         dirtyStateSignal.set('DIRTY');
       }
+      previousValue = newValue;
     },
     {
       allowSignalWrites: true,

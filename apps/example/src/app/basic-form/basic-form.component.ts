@@ -28,6 +28,7 @@ import { CustomErrorComponent } from '../custom-input-error.component';
 
       <div>
         <button (click)="reset()">Reset form</button>
+        <button (click)="prefill()">Prefill form</button>
 
         <h3>States</h3>
         <pre
@@ -85,7 +86,9 @@ export default class BasicFormComponent {
     this.form.reset();
   }
 
-  setForm() {
-    // TODO: allow form values to be set
+  prefill() {
+    // TODO: improve this API to set form groups
+    this.form.controls.age.value.set(42);
+    this.form.controls.name.value.set('Bob');
   }
 }
