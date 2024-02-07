@@ -33,10 +33,7 @@ export function createValidateState(): WritableSignal<ValidateState> {
   });
 }
 
-  export function executeValidator(
-    state: WritableSignal<ValidateState>,
-    value: unknown,
-    validator: Validator) {
+export function executeValidator(state: WritableSignal<ValidateState>, value: unknown, validator: Validator) {
   if (typeof validator === 'function') {
     validator(value, (newState, newErrors?) => {
       state.set({state: newState, errors: (newErrors as ValidationErrors) ?? null});
@@ -61,6 +58,8 @@ export function createValidateState(): WritableSignal<ValidateState> {
       }
       state.set({state: newState, errors: newErrors ?? null});
     });
+  } else {
+    state.set({state: 'VALID', errors: null});
   }
   return;
 }
