@@ -18,4 +18,8 @@ export const routes: Routes = [
     path: 'multi-page-form',
     loadChildren: () => import('./multi-page-form/multi-page-form.routes'),
   },
+  {
+    path: 'form-with-cva',
+    loadComponent: () => import('./form-with-cva/form-with-cva.component'),
+  },
 ];
