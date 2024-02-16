@@ -16,8 +16,8 @@ import { SIGNAL_INPUT_MODIFIER, SignalInputModifier } from "./signal-input-modif
     '[class.ng-dirty]': 'this.formField?.dirtyState() === "DIRTY"',
     '[class.ng-touched]': 'this.formField?.touchedState() === "TOUCHED"',
     '[class.ng-untouched]': 'this.formField?.touchedState() === "UNTOUCHED"',
-    '[attr.disabled]': '!propagateState ? undefined : this.formField?.disabled() ? true : undefined',
-    '[attr.readonly]': '!propagateState ? undefined : this.formField?.readOnly() ? true : undefined',
+    '[attr.disabled]': '!propagateState ? undefined : this.formField?.disabled?.() ? true : undefined',
+    '[attr.readonly]': '!propagateState ? undefined : this.formField?.readOnly?.() ? true : undefined',
   },
 })
 export class SignalInputDirective implements OnInit {
@@ -30,7 +30,7 @@ export class SignalInputDirective implements OnInit {
   onModelChange(value: unknown) {
     if (this.modifiers && this.modifiers.length === 1) {
       this.modifiers[0].onModelChange(value);
-    } else if (this.formField) {
+    } else if (this.formField && this.formField.value.set) {
       this.formField.value.set(value);
     }
   }
@@ -67,6 +67,6 @@ export class SignalInputDirective implements OnInit {
       emitModelToViewChange: true,
     }));
 
-    this.formField?.registerOnReset(value => this.model.control.setValue(value))
+    this.formField?.registerOnReset?.(value => this.model.control.setValue(value))
   }
 }

@@ -1,16 +1,16 @@
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  SignalFormBuilder,
+  createFormGroup,
   SignalInputDebounceDirective,
   SignalInputDirective,
   SignalInputErrorDirective,
-  withErrorComponent,
+  withErrorComponent
 } from '@ng-signal-forms';
 import { CustomErrorComponent } from '../custom-input-error.component';
-import { AddressComponent } from './../address/address.component';
-import { Address } from '../address/address';
+import { AddressComponent } from './address/address.component';
+
 @Component({
   selector: 'app-basic-form',
   template: `
@@ -69,25 +69,17 @@ import { Address } from '../address/address';
   providers: [withErrorComponent(CustomErrorComponent)],
 })
 export default class FormWithCvaComponent {
-  private sfb = inject(SignalFormBuilder);
-
   // TODO: type of address should be Address | null
-  form = this.sfb.createFormGroup<{ name: string; age: number | null; address: any | null; }>({
+  form = createFormGroup({
     name: 'Alice',
-    age: null,
-    address: { city: 'Vienna'}
+    age: null as number | null,
+    // TODO: this should a form group so the initial value will be set in the form
+    // but if we make this a group now, then the user input is not emitted back to the form
+    address: { city: 'Vienna'} as any
   });
 
   formChanged = effect(() => {
     console.log('form changed:', this.form.value());
-  });
-
-  nameChanged = effect(() => {
-    console.log('name changed:', this.form.controls.name.value());
-  });
-
-  ageChanged = effect(() => {
-    console.log('age changed:', this.form.controls.age.value());
   });
 
   reset() {
