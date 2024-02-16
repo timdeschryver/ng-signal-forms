@@ -1,10 +1,10 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import {
-  SignalFormBuilder,
+  createFormGroup,
   SignalInputDebounceDirective,
   SignalInputDirective,
   SignalInputErrorDirective,
-  withErrorComponent,
+  withErrorComponent
 } from '@ng-signal-forms';
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -63,9 +63,7 @@ import { CustomErrorComponent } from '../custom-input-error.component';
   providers: [withErrorComponent(CustomErrorComponent)],
 })
 export default class BasicFormComponent {
-  private sfb = inject(SignalFormBuilder);
-
-  form = this.sfb.createFormGroup<{ name: string; age: number | null }>({
+  form = createFormGroup<{ name: string; age: number | null }>({
     name: 'Alice',
     age: null,
   });

@@ -7,7 +7,7 @@ import {
   SignalInputDebounceDirective,
   SignalInputDirective,
   SignalInputErrorDirective,
-  V,
+  Validators,
   Validator,
   withErrorComponent,
 } from '@ng-signal-forms';
@@ -45,7 +45,7 @@ import { CustomErrorComponent } from '../custom-input-error.component';
             ngModel
             [formField]="form.controls.passwords.controls.password"
           />
-          
+
           @if(form.controls.passwords.hasError('minLength')) {
             <small>
                 {{ form.controls.passwords.errorMessage('minLength') }}
@@ -135,7 +135,7 @@ export default class SimpleFormComponent {
   private sfb = inject(SignalFormBuilder);
   form = this.sfb.createFormGroup(() => {
     const username = this.sfb.createFormField('', {
-      validators: [V.required(), uniqueUsername()],
+      validators: [Validators.required(), uniqueUsername()],
     });
 
     return {
@@ -143,9 +143,9 @@ export default class SimpleFormComponent {
       passwords: this.sfb.createFormGroup(() => {
         const password = this.sfb.createFormField('', (pw) => ({
           validators: [
-            V.required(),
+            Validators.required(),
             {
-              validator: V.minLength(5),
+              validator: Validators.minLength(5),
               disable: () => pw().toLocaleLowerCase().startsWith('rob'),
               message: ({
                 currentLength,
@@ -168,7 +168,7 @@ export default class SimpleFormComponent {
           passwordConfirmation: this.sfb.createFormField<string | undefined>(
             undefined,
             {
-              validators: [V.required(), V.equalsTo(password.value)],
+              validators: [Validators.required(), Validators.equalsTo(password.value)],
               hidden: () => {
                 return password.value() === '';
               },
@@ -181,17 +181,17 @@ export default class SimpleFormComponent {
           return [];
         },
         {
-          validators: [V.minLength(1)],
+          validators: [Validators.minLength(1)],
         }
       ),
-      
+
       team:  this.sfb.createFormGroup([
         this.sfb.createFormField(''),
         this.sfb.createFormField(''),
         this.sfb.createFormField(''),
       ]),
     };
-    
+
   });
 
   createTodo = () => {
@@ -199,8 +199,8 @@ export default class SimpleFormComponent {
       return {
         description: this.sfb.createFormField('', {
           validators: [
-            V.required(),
-            V.minLength(5),
+            Validators.required(),
+            Validators.minLength(5),
             todoUniqueInList(
               this.form.controls.todos.value as unknown as Signal<Todo[]>
             ),
