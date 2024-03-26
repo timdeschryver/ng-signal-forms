@@ -16,6 +16,9 @@ import { RouterLink, RouterOutlet } from '@angular/router';
         <li>
           <a routerLink="multi-page-form">Multipage form</a>
         </li>
+        <li>
+          <a routerLink="form-with-cva">Form with CVA</a>
+        </li>
       </ul>
     </nav>
     <router-outlet />
