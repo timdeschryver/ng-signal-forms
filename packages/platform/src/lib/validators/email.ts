@@ -18,10 +18,11 @@ export function email(): ValidatorFn {
     if (valid) {
       setState('VALID');
     } else {
-      // TODO - I do not fully trust that I understand what the shape of the `ValidationErrors` should be
       setState('INVALID', {
         email: {
-          details: true,
+          details: {
+            currentValue: value,
+          },
         },
       });
     }
