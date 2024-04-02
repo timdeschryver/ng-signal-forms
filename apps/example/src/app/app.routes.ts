@@ -22,4 +22,8 @@ export const routes: Routes = [
     path: 'form-with-cva',
     loadComponent: () => import('./form-with-cva/form-with-cva.component'),
   },
+  {
+    path: 'validators',
+    loadComponent: () => import('./validators/validators.component'),
+  },
 ];
