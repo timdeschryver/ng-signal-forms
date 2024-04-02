@@ -1,7 +1,8 @@
 import { SetValidationState, ValidatorFn } from '../validation';
 
 /**
- * @description Email regex is directly from the Angular Forms definition
+ * @description Email regex pattern is directly from the Angular Forms definition.
+ *              Note: other assumptions on validation differ from Angular reactive forms.
  * @link https://github.com/angular/angular/blob/17.3.2/packages/forms/src/validators.ts#L126
  */
 const EMAIL_REGEXP =
