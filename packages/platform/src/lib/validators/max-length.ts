@@ -9,7 +9,7 @@ export function maxLength(length: number): ValidatorFn<string | Array<unknown>> 
       setState('VALID');
     } else {
       setState('INVALID', {
-        minLength: {
+        maxLength: {
           details: {
             currentLength: value.length,
             maxLength: length
