@@ -1,6 +1,13 @@
 {
   "name": "ng-signal-forms",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "repository": "https://github.com/timdeschryver/ng-signal-forms",
+  "keywords": [
+    "angular",
+    "forms",
+    "reactive forms",
+    "signals"
+  ],
   "peerDependencies": {
     "@angular/core": "^17.0.0",
     "rxjs": "^7.8.0"
