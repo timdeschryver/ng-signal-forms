@@ -131,3 +131,7 @@ export function computeState(validateSignal: Signal<ValidateState[]>) {
     return 'VALID';
   });
 }
+
+export function hasValidator(validators: Validator<any>[] | undefined, validator: Validator): boolean {
+  return Array.isArray(validators) ? validators.includes(validator) : validators === validator;
+}
