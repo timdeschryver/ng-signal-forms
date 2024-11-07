@@ -38,6 +38,7 @@ export type FormField<Value = unknown> = {
   readOnly: Signal<boolean>;
   markAsTouched: () => void;
   markAsDirty: () => void;
+  markAsPristine: () => void;
   reset: () => void;
   hasError: (errorKey: string) => boolean;
   errorMessage: (errorKey: string) => string | undefined,
@@ -157,6 +158,7 @@ export function createFormField<Value>(
     readOnly: readOnlySignal,
     markAsTouched: () => touchedStateSignal.set('TOUCHED'),
     markAsDirty: () => dirtyStateSignal.set('DIRTY'),
+    markAsPristine: () => dirtyStateSignal.set('PRISTINE'),
     hasError: (errorKey: string) => !!errorsSignal()[errorKey],
     errorMessage: (errorKey: string) => errorsArraySignal().find(e => e.key === errorKey)?.message,
     registerOnReset: (fn: (value: Value) => void) => (onReset = fn),

@@ -27,10 +27,10 @@ import {
 export type FormGroup<Fields extends FormGroupCreatorOrSignal = {}> = {
   __type: 'FormGroup';
   value: Signal<UnwrappedFormGroup<Fields>>;
-  controls: Fields extends WritableSignal<FormGroup<infer G>[]> 
-    ? FormGroupFields<Fields> & WritableSignal<FormGroup<G>[]> 
-    : Fields extends WritableSignal<infer F> 
-    ? FormGroupFields<Fields> & WritableSignal<F> 
+  controls: Fields extends WritableSignal<FormGroup<infer G>[]>
+    ? FormGroupFields<Fields> & WritableSignal<FormGroup<G>[]>
+    : Fields extends WritableSignal<infer F>
+    ? FormGroupFields<Fields> & WritableSignal<F>
     : FormGroupFields<Fields>;
   valid: Signal<boolean>;
   state: Signal<ValidationState>;
@@ -43,6 +43,7 @@ export type FormGroup<Fields extends FormGroupCreatorOrSignal = {}> = {
   hasError: (errorKey: string) => boolean;
   errorMessage: (errorKey: string) => string | undefined;
   markAllAsTouched: () => void;
+  markAsPristine: () => void;
   reset: () => void;
 };
 
@@ -195,6 +196,15 @@ export function createFormGroup<FormFields extends FormGroupCreator>(
       }
       Object.values(fg).forEach((f) => markFormControlAsTouched(f));
     },
+    markAsPristine: () => {
+      const fg = isSignal(formFieldsMapOrSignal)
+        ? formFieldsMapOrSignal()
+        : formFieldsMapOrSignal;
+
+      Object.values(fg).forEach((f) => {
+        f.markAsPristine();
+      });
+    },
     reset: () => {
       const fg = isSignal(formFieldsMapOrSignal)
         ? formFieldsMapOrSignal()
@@ -205,7 +215,7 @@ export function createFormGroup<FormFields extends FormGroupCreator>(
         (formFieldsMapOrSignal as WritableSignal<any[]>).set([
           ...initialArrayControls,
         ]);
-        
+
         for (const ctrl of initialArrayControls) {
           ctrl.reset();
         }
