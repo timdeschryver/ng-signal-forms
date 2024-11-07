@@ -13,6 +13,7 @@ import {
   computeState,
   computeValidateState,
   computeValidators,
+  hasValidator,
   InvalidDetails,
   ValidationState,
   Validator,
@@ -27,10 +28,10 @@ import {
 export type FormGroup<Fields extends FormGroupCreatorOrSignal = {}> = {
   __type: 'FormGroup';
   value: Signal<UnwrappedFormGroup<Fields>>;
-  controls: Fields extends WritableSignal<FormGroup<infer G>[]> 
-    ? FormGroupFields<Fields> & WritableSignal<FormGroup<G>[]> 
-    : Fields extends WritableSignal<infer F> 
-    ? FormGroupFields<Fields> & WritableSignal<F> 
+  controls: Fields extends WritableSignal<FormGroup<infer G>[]>
+    ? FormGroupFields<Fields> & WritableSignal<FormGroup<G>[]>
+    : Fields extends WritableSignal<infer F>
+    ? FormGroupFields<Fields> & WritableSignal<F>
     : FormGroupFields<Fields>;
   valid: Signal<boolean>;
   state: Signal<ValidationState>;
@@ -41,6 +42,7 @@ export type FormGroup<Fields extends FormGroupCreatorOrSignal = {}> = {
   errors: Signal<{}>;
   errorsArray: Signal<InvalidDetails[]>;
   hasError: (errorKey: string) => boolean;
+  hasValidator: (validator: Validator) => boolean;
   errorMessage: (errorKey: string) => string | undefined;
   markAllAsTouched: () => void;
   reset: () => void;
@@ -179,6 +181,13 @@ export function createFormGroup<FormFields extends FormGroupCreator>(
       return myErrors.concat(...childErrors);
     }),
     hasError: (errorKey: string) => !!errorsSignal()[errorKey],
+    hasValidator: (validator: Validator) => {
+      if (options !== undefined) {
+        return hasValidator(options.validators, validator);
+      } else {
+        return false;
+      }
+    },
     errorMessage: (errorKey: string) => errorsArraySignal().find(e => e.key === errorKey)?.message,
     dirtyState: dirtyStateSignal,
     dirty: dirtySignal,
@@ -205,7 +214,7 @@ export function createFormGroup<FormFields extends FormGroupCreator>(
         (formFieldsMapOrSignal as WritableSignal<any[]>).set([
           ...initialArrayControls,
         ]);
-        
+
         for (const ctrl of initialArrayControls) {
           ctrl.reset();
         }

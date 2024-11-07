@@ -13,6 +13,7 @@ import {
   computeState,
   computeValidateState,
   computeValidators,
+  hasValidator,
   InvalidDetails,
   ValidationErrors,
   ValidationState,
@@ -40,6 +41,7 @@ export type FormField<Value = unknown> = {
   markAsDirty: () => void;
   reset: () => void;
   hasError: (errorKey: string) => boolean;
+  hasValidator: (validator: Validator) => boolean;
   errorMessage: (errorKey: string) => string | undefined,
   registerOnReset: (fn: (value: Value) => void) => void;
 };
@@ -158,6 +160,13 @@ export function createFormField<Value>(
     markAsTouched: () => touchedStateSignal.set('TOUCHED'),
     markAsDirty: () => dirtyStateSignal.set('DIRTY'),
     hasError: (errorKey: string) => !!errorsSignal()[errorKey],
+    hasValidator: (validator: Validator) => {
+      if (finalOptions !== undefined) {
+        return hasValidator(finalOptions.validators, validator);
+      } else {
+        return false;
+      }
+    },
     errorMessage: (errorKey: string) => errorsArraySignal().find(e => e.key === errorKey)?.message,
     registerOnReset: (fn: (value: Value) => void) => (onReset = fn),
     reset: () => {
