@@ -45,6 +45,7 @@ export type FormGroup<Fields extends FormGroupCreatorOrSignal = {}> = {
   hasValidator: (validator: Validator) => boolean;
   errorMessage: (errorKey: string) => string | undefined;
   markAllAsTouched: () => void;
+  markAllAsPristine: () => void;
   reset: () => void;
 };
 
@@ -203,6 +204,17 @@ export function createFormGroup<FormFields extends FormGroupCreator>(
         return;
       }
       Object.values(fg).forEach((f) => markFormControlAsTouched(f));
+    },
+    markAllAsPristine: () => {
+      const fg = isSignal(formFieldsMapOrSignal)
+        ? formFieldsMapOrSignal()
+        : formFieldsMapOrSignal;
+
+      if (Array.isArray(fg)) {
+        fg.forEach((f) => f.markAsPristine());
+        return;
+      }
+      Object.values(fg).forEach((f) => f.markAsPristine());
     },
     reset: () => {
       const fg = isSignal(formFieldsMapOrSignal)
