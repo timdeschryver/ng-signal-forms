@@ -1,7 +1,7 @@
 {
   "name": "ng-signal-forms",
   "version": "0.0.0",
-  "private": true,
+  "license": "MIT",
   "scripts": {
     "ng": "ng",
     "start": "nx serve example --host 0.0.0.0",
