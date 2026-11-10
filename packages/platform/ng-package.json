@@ -1,9 +1,6 @@
 {
   "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "../../dist/packages/ng-signal-forms",
-  "assets": [
-    { "input": "../..", "glob": "LICENSE", "output": "." }
-  ],
   "lib": {
     "entryFile": "src/index.ts"
   }
