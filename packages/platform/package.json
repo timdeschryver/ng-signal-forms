@@ -1,6 +1,7 @@
 {
   "name": "ng-signal-forms",
   "version": "0.0.2",
+  "license": "MIT",
   "repository": "https://github.com/timdeschryver/ng-signal-forms",
   "keywords": [
     "angular",
